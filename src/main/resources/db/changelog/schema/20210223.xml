@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="auditor"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="auditor">
+            <column name="id" type="serial"/>
+            <column name="email" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="auditor" columnNames="id" constraintName="pk_auditor"/>
+
+    </changeSet>
+
+    <changeSet id="2" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="auditor_id" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="auditor_id" type="integer"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="monitoring" baseColumnNames="auditor_id"
+                                 constraintName="fk_monitoring_to_auditor"
+                                 referencedTableName="auditor"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="4" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="sasu_office_id" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="sasu_office_id" type="integer"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="monitoring" baseColumnNames="sasu_office_id"
+                                 constraintName="fk_monitoring_to_sasu_office"
+                                 referencedTableName="sasu_office"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="5" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="start_date" tableName="tender"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="tender">
+            <column name="start_date" type="date"/>
+        </addColumn>
+
+    </changeSet>
+
+
+</databaseChangeLog>

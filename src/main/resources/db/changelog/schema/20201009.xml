@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="procurement_category"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="procurement_category">
+            <column name="id" type="smallint"/>
+            <column name="name_en" type="text"/>
+            <column name="name_ua" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="procurement_category" columnNames="id" constraintName="pk_procurement_category"/>
+
+        <addUniqueConstraint tableName="procurement_category" columnNames="name_en"
+                             constraintName="unique_procurement_category_name_en"/>
+        <addUniqueConstraint tableName="procurement_category" columnNames="name_ua"
+                             constraintName="unique_procurement_category_name_ua"/>
+    </changeSet>
+
+
+    <changeSet id="2" author="eddy">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="cpv_catalogue"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="cpv_catalogue">
+            <column name="id" type="integer"/>
+            <column name="cpv" type="text"/>
+            <column name="cpv2" type="text"/>
+            <column name="cpv3" type="text"/>
+            <column name="cpv4" type="text"/>
+            <column name="cpv5" type="text"/>
+            <column name="cpv6" type="text"/>
+            <column name="cpv7" type="text"/>
+            <column name="cpv8" type="text"/>
+            <column name="cpv_code" type="text"/>
+            <column name="name" type="text"/>
+            <column name="parent_cpv" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="cpv_catalogue" columnNames="id"/>
+    </changeSet>
+
+    <changeSet id="3" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="procuring_entity"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="procuring_entity">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="outer_id" type="text"/>
+            <column name="name" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="procuring_entity" columnNames="id" constraintName="pk_procuring_entity"/>
+
+        <addUniqueConstraint tableName="procuring_entity" columnNames="outer_id"
+                             constraintName="unique_procuring_entity"/>
+    </changeSet>
+
+    <changeSet id="3.1" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tender"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="tender">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="hash" type="text"/>
+            <column name="outer_id" type="text"/>
+            <column name="date_modified" type="timestamp"/>
+            <column name="date" type="timestamp"/>
+            <column name="status" type="text"/>
+            <column name="local_method" type="text"/>
+            <column name="procurement_category_id" type="integer"/>
+            <column name="procuring_entity_id" type="integer"/>
+            <column name="expected_value" type="real"/>
+            <column name="value" type="real"/>
+
+        </createTable>
+
+        <addPrimaryKey tableName="tender" columnNames="id" constraintName="pk_tender"/>
+
+        <addForeignKeyConstraint baseTableName="tender" baseColumnNames="procurement_category_id"
+                                 constraintName="fk_tender_to_procurement_category"
+                                 referencedTableName="procurement_category"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="tender" baseColumnNames="procuring_entity_id"
+                                 constraintName="fk_tender_to_procuring_entity"
+                                 referencedTableName="procuring_entity"
+                                 referencedColumnNames="id"/>
+
+
+    </changeSet>
+
+    <changeSet id="4" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tender_item"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tender_item">
+            <column name="id" type="bigserial" autoIncrement="true"/>
+            <column name="outer_id" type="text"/>
+            <column name="tender_id" type="integer"/>
+            <column name="cpv_id" type="integer"/>
+        </createTable>
+
+        <addPrimaryKey tableName="tender_item" columnNames="id" constraintName="pk_tender_item"/>
+
+        <addUniqueConstraint tableName="tender_item" columnNames="outer_id, tender_id"
+                             constraintName="unique_tender_item"/>
+
+        <addForeignKeyConstraint baseTableName="tender_item" baseColumnNames="tender_id"
+                                 constraintName="fk_tender_item_to_tender"
+                                 referencedTableName="tender"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="tender_item" baseColumnNames="cpv_id"
+                                 constraintName="fk_tender_item_to_cpv_catalogue"
+                                 referencedTableName="cpv_catalogue"
+                                 referencedColumnNames="id"/>
+
+
+    </changeSet>
+
+    <changeSet id="5" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="exchange_rate"/>
+            </not>
+        </preConditions>
+        <createTable tableName="exchange_rate">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="exchange_date" type="date"/>
+            <column name="currency" type="text"/>
+            <column name="rate" type="decimal"/>
+        </createTable>
+
+        <addPrimaryKey tableName="exchange_rate" columnNames="id"/>
+        <addUniqueConstraint tableName="exchange_rate" columnNames="currency,exchange_date"/>
+    </changeSet>
+
+    <changeSet id="6" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="monitoring"/>
+            </not>
+        </preConditions>
+        <createTable tableName="monitoring">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="outer_id" type="text"/>
+            <column name="date_modified" type="timestamp"/>
+            <column name="tender_id" type="integer"/>
+            <column name="result" type="text"/>
+            <column name="start_date" type="timestamp"/>
+            <column name="start_month" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="monitoring" columnNames="id"/>
+        <addUniqueConstraint tableName="monitoring" columnNames="outer_id"/>
+
+        <addForeignKeyConstraint baseTableName="monitoring" baseColumnNames="tender_id"
+                                 constraintName="fk_monitoring_to_tender"
+                                 referencedTableName="tender"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="7" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="award"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="award">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="outer_id" type="text"/>
+            <column name="tender_id" type="integer"/>
+            <column name="value" type="real"/>
+        </createTable>
+
+        <addPrimaryKey tableName="award" columnNames="id"/>
+        <addUniqueConstraint tableName="award" columnNames="outer_id"/>
+
+        <addForeignKeyConstraint baseTableName="award" baseColumnNames="tender_id"
+                                 constraintName="fk_award_to_tender"
+                                 referencedTableName="tender"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="8" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="violation"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="violation">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="name" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="violation" columnNames="id"/>
+        <addUniqueConstraint tableName="violation" columnNames="name"/>
+
+    </changeSet>
+
+    <changeSet id="9" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="monitoring_violation"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="monitoring_violation">
+            <column name="monitoring_id" type="integer"/>
+            <column name="violation_id" type="integer"/>
+        </createTable>
+
+        <addPrimaryKey tableName="monitoring_violation" columnNames="monitoring_id,violation_id"/>
+
+        <addForeignKeyConstraint baseTableName="monitoring_violation" baseColumnNames="monitoring_id"
+                                 constraintName="fk_monitoring_violation_to_monitoring"
+                                 referencedTableName="monitoring"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="monitoring_violation" baseColumnNames="violation_id"
+                                 constraintName="fk_monitoring_violation_to_violation"
+                                 referencedTableName="violation"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="10" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="region"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="region">
+            <column name="id" type="smallint"/>
+            <column name="name" type="text"/>
+            <column name="aliases" type="text[]"/>
+        </createTable>
+
+        <addPrimaryKey tableName="region" columnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="11" author="eddy">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="region_id" tableName="procuring_entity"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="procuring_entity">
+            <column name="region_id" type="smallint"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="12" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="tender_item" indexName="tender_item_to_tender_idx"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="tender_item" indexName="tender_item_to_tender_idx">
+            <column name="tender_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="13" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="award" indexName="award_to_tender_idx"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="award" indexName="award_to_tender_idx">
+            <column name="tender_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="14" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sasu_office"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="sasu_office">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="name" type="text"/>
+            <column name="aliases" type="text[]"/>
+            <column name="region_id" type="smallint"/>
+        </createTable>
+
+        <addPrimaryKey tableName="sasu_office" columnNames="id" />
+
+        <addForeignKeyConstraint baseTableName="sasu_office" baseColumnNames="region_id"
+                                 constraintName="fk_sasu_office_to_region"
+                                 referencedTableName="region"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+
+
+</databaseChangeLog>
