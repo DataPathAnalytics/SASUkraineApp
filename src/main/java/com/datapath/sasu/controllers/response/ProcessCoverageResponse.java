@@ -13,36 +13,44 @@ public class ProcessCoverageResponse {
 
     @Data
     public static class TendersDistribution {
-        private Integer completeTendersCount;
-        private Integer cancelledTendersCount;
-        private Integer othersTendersCount;
+        private int completeTendersCount;
+        private int cancelledTendersCount;
+        private int othersTendersCount;
 
-        private Integer completeProcuringEntityCount;
-        private Integer cancelledProcuringEntityCount;
-        private Integer othersProcuringEntityCount;
+        private int completeProcuringEntityCount;
+        private int cancelledProcuringEntityCount;
+        private int othersProcuringEntityCount;
 
-        private Double completeTendersAmount;
-        private Double cancelledTendersAmount;
-        private Double othersTendersAmount;
+        private double completeTendersAmount;
+        private double cancelledTendersAmount;
+        private double othersTendersAmount;
 
-        private Integer tendersCount;
-        private Double tendersAmount;
+        private int tendersCount;
+        private double tendersAmount;
+        private double procuringEntityCount;
 
-        private Integer monitoringTendersCount;
-        private Double monitoringTendersAmount;
+        private int monitoringTendersCount;
+        private double monitoringTendersAmount;
+        private int monitoringProcuringEntityCount;
 
-        private Integer nonMonitoringTendersCount;
-        private Double nonMonitoringTendersAmount;
+        private int nonMonitoringTendersCount;
+        private double nonMonitoringTendersAmount;
+        private int nonMonitoringProcuringEntityCount;
 
-        private Integer activeMonitoringTendersCount;
-        private Integer violationMonitoringTendersCount;
-        private Integer nonViolationMonitoringTendersCount;
-        private Integer cancelledMonitoringTendersCount;
+        private int activeMonitoringTendersCount;
+        private int violationMonitoringTendersCount;
+        private int nonViolationMonitoringTendersCount;
+        private int cancelledMonitoringTendersCount;
 
-        private Double activeMonitoringAmount;
-        private Double violationMonitoringAmount;
-        private Double nonViolationMonitoringAmount;
-        private Double cancelledMonitoringAmount;
+        private double activeMonitoringAmount;
+        private double violationMonitoringAmount;
+        private double nonViolationMonitoringAmount;
+        private double cancelledMonitoringAmount;
+
+        private int activeMonitoringProcuringEntityCount;
+        private int violationMonitoringProcuringEntityCount;
+        private int nonViolationMonitoringProcuringEntityCount;
+        private int cancelledMonitoringProcuringEntityCount;
 
     }
 

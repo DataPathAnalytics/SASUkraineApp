@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class ProcessCoverageRequest {
+public class ResultsRequest {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

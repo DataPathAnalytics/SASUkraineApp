@@ -69,5 +69,17 @@
 
     </changeSet>
 
+    <changeSet id="6" author="eddy">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="award"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="award">
+            <column name="status" type="text"/>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

@@ -93,11 +93,13 @@ public class MergeConverter implements Converter {
 
             Double value = variableProcessor.getAwardValue(apiAward, exchangeRateDate.toLocalDate());
             award.setValue(value);
+            award.setStatus(apiAward.getStatus());
 
             if (award.getId() == null) {
                 tenderEntity.addAward(award);
             }
         });
+        tenderEntity.getAwards().removeIf(award -> !"active".equals(award.getStatus()));
     }
 
     private void mergeItems(TenderAPI tenderAPI, Tender tenderEntity) {

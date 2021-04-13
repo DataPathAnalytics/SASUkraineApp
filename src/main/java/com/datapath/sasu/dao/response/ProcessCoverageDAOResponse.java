@@ -26,9 +26,13 @@ public class ProcessCoverageDAOResponse {
 
         private Integer tendersCount;
         private Double tendersAmount;
+        private Integer procuringEntityCount;
 
         private Integer monitoringTendersCount;
         private Double monitoringTendersAmount;
+
+        private Integer monitoringProcuringEntityCount;
+        private Integer nonMonitoringProcuringEntityCount;
 
         private Integer nonMonitoringTendersCount;
         private Double nonMonitoringTendersAmount;
@@ -42,6 +46,11 @@ public class ProcessCoverageDAOResponse {
         private Double violationMonitoringAmount;
         private Double nonViolationMonitoringAmount;
         private Double cancelledMonitoringAmount;
+
+        private Integer activeMonitoringProcuringEntityCount;
+        private Integer violationMonitoringProcuringEntityCount;
+        private Integer nonViolationMonitoringProcuringEntityCount;
+        private Integer cancelledMonitoringProcuringEntityCount;
 
     }
 

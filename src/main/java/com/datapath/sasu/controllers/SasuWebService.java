@@ -3,10 +3,7 @@ package com.datapath.sasu.controllers;
 import com.datapath.sasu.DataMapper;
 import com.datapath.sasu.controllers.request.*;
 import com.datapath.sasu.controllers.response.*;
-import com.datapath.sasu.dao.request.ProcessCoverageDAORequest;
-import com.datapath.sasu.dao.request.ProcessMarketDAORequest;
-import com.datapath.sasu.dao.request.ProcessMethodsDAORequest;
-import com.datapath.sasu.dao.request.ProcessRegionsDAORequest;
+import com.datapath.sasu.dao.request.*;
 import com.datapath.sasu.dao.response.*;
 import com.datapath.sasu.dao.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,8 @@ public class SasuWebService {
     private ProcessMethodsDAOService processMethodsDAOService;
     @Autowired
     private ProcessCoverageDAOService processCoverageDAOService;
+    @Autowired
+    private ResultsDAOService resultsDAOService;
     @Autowired
     private DataMapper mapper;
 
@@ -110,6 +109,12 @@ public class SasuWebService {
     public ProcessCoverageResponse getProcessCoverage(ProcessCoverageRequest request) {
         ProcessCoverageDAORequest daoRequest = mapper.map(request);
         ProcessCoverageDAOResponse daoResponse = processCoverageDAOService.getResponse(daoRequest);
+        return mapper.map(daoResponse);
+    }
+
+    public ResultsResponse getResults(ResultsRequest request) {
+        ResultsDAORequest daoRequest = mapper.map(request);
+        ResultsDAOResponse daoResponse = resultsDAOService.getResponse(daoRequest);
         return mapper.map(daoResponse);
     }
 }

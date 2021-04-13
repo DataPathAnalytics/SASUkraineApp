@@ -19,10 +19,10 @@ import java.util.TimeZone;
 import static com.datapath.sasu.Constants.UA_ZONE;
 
 @SpringBootApplication
+@EnableAsync
 @EnableScheduling
 @EnableTransactionManagement
 @EnableCaching
-@EnableAsync
 @EnableRetry
 public class SasuApplication {
 

@@ -1,14 +1,8 @@
 package com.datapath.sasu;
 
-import com.datapath.sasu.controllers.request.ProcessCoverageRequest;
-import com.datapath.sasu.controllers.request.ProcessMarketRequest;
-import com.datapath.sasu.controllers.request.ProcessMethodsRequest;
-import com.datapath.sasu.controllers.request.ProcessRegionsRequest;
+import com.datapath.sasu.controllers.request.*;
 import com.datapath.sasu.controllers.response.*;
-import com.datapath.sasu.dao.request.ProcessCoverageDAORequest;
-import com.datapath.sasu.dao.request.ProcessMarketDAORequest;
-import com.datapath.sasu.dao.request.ProcessMethodsDAORequest;
-import com.datapath.sasu.dao.request.ProcessRegionsDAORequest;
+import com.datapath.sasu.dao.request.*;
 import com.datapath.sasu.dao.response.*;
 import org.mapstruct.Mapper;
 
@@ -36,4 +30,8 @@ public interface DataMapper {
     ProcessCoverageDAORequest map(ProcessCoverageRequest request);
 
     ProcessCoverageResponse map(ProcessCoverageDAOResponse daoResponse);
+
+    ResultsDAORequest map(ResultsRequest request);
+
+    ResultsResponse map(ResultsDAOResponse daoResponse);
 }

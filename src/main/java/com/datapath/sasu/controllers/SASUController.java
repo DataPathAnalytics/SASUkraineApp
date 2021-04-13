@@ -60,4 +60,10 @@ public class SASUController {
         return service.getProcessCoverage(request);
     }
 
+    @RequestMapping("/results-results")
+    public ResultsResponse results(@Validated ResultsRequest request) {
+        return service.getResults(request);
+    }
+
+
 }

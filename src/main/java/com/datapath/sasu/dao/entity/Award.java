@@ -18,6 +18,8 @@ public class Award {
 
     private Double value;
 
+    private String status;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tender_id")
     private Tender tender;

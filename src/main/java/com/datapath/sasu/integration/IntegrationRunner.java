@@ -24,22 +24,22 @@ public class IntegrationRunner {
     @Autowired
     private ThreadPoolTaskExecutor applicationTaskExecutor;
 
-//    @Scheduled(fixedDelay = 43_200_000)
-//    public void loadOldTenders() {
-//
-//        int queueSize = applicationTaskExecutor.getThreadPoolExecutor().getQueue().size();
-//        if (queueSize < 300) {
-//            feedLoader.load();
-//            monitoringLoader.load(MONITORING_START.toLocalDateTime());
-//        }
-//    }
+    @Scheduled(fixedDelay = 43_200_000)
+    public void loadOldTenders() {
 
-//    @Scheduled(fixedDelay = 20_000)
-//    public void printQueue() {
-//        log.info("Queue size {}", applicationTaskExecutor.getThreadPoolExecutor().getQueue().size());
-//    }
+        int queueSize = applicationTaskExecutor.getThreadPoolExecutor().getQueue().size();
+        if (queueSize < 300) {
+            feedLoader.load();
+            monitoringLoader.load(MONITORING_START.toLocalDateTime());
+        }
+    }
 
-    @Scheduled(fixedDelay = 600_000)
+    @Scheduled(fixedDelay = 20_000)
+    public void printQueue() {
+        log.info("Queue size {}", applicationTaskExecutor.getThreadPoolExecutor().getQueue().size());
+    }
+
+    @Scheduled(fixedDelay = 1_200_000)
     public void loadNewTenders() {
         tenderingLoader.load();
         monitoringLoader.loadLastModified();

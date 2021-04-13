@@ -7,5 +7,6 @@ public class AwardAPI {
 
     private String id;
     private Value value;
+    private String status;
 
 }

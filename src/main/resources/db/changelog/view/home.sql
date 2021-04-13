@@ -17,4 +17,4 @@ SELECT t.id          AS tender_id,
 FROM tender AS t
          JOIN procuring_entity AS p ON p.id = t.procuring_entity_id
          JOIN monitoring AS m ON t.id = m.tender_id
-         JOIN monitoring_violation AS mv ON m.id = mv.monitoring_id
+         LEFT JOIN monitoring_violation AS mv ON m.id = mv.monitoring_id
