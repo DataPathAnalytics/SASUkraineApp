@@ -17,6 +17,12 @@ import static org.springframework.util.StringUtils.collectionToCommaDelimitedStr
 @Component
 public class ResourcesDynamicsDAOService {
 
+    private static final String PERIOD_FILTER;
+
+    static {
+        PERIOD_FILTER = "( (tender_date >= ? AND tender_start_date < ? AND tender_status IN ('complete', 'unsuccessful', 'cancelled')) " +
+                "   OR (tender_start_date <= ? AND tender_status NOT IN ('complete', 'unsuccessful', 'cancelled')) ) ";
+    }
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -35,9 +41,9 @@ public class ResourcesDynamicsDAOService {
 
         return jdbcTemplate.queryForObject(
                 "SELECT\n" +
-                        "SUM(tender_expected_value) FILTER ( WHERE has_monitoring ) * 100 / SUM (tender_expected_value)\n" +
-                        "FROM resources_dynamics WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause,
-                Integer.class, startDate, endDate);
+                        "SUM(tender_expected_value) FILTER ( WHERE has_monitoring " + regionClause + ") * 100 / SUM(tender_expected_value)\n" +
+                        "FROM resources_dynamics WHERE " + PERIOD_FILTER,
+                Integer.class, startDate, endDate, endDate);
     }
 
     public List<DynamicTender> getDynamicTenders(LocalDate startDate, LocalDate endDate, List<Integer> regionIds) {

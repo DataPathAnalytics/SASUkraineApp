@@ -3,11 +3,13 @@ package com.datapath.sasu.controllers.response;
 import com.datapath.sasu.dao.entity.DateInteger;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class HomeResponse {
 
+    private LocalDate updatedDate;
     private List<ProcuringEntity> top20ProcuringEntity;
     private Long tendersAmount;
     private Integer procuringEntitiesCount;

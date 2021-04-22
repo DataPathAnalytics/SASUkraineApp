@@ -9,7 +9,7 @@ public class ProcessMethodsResponse {
 
     private Double procedureMonitoringCoverage;
     private Integer tendersCount;
-    private Integer tendersAmount;
+    private Double tendersAmount;
     private Integer procuringEntityCount;
     private List<LocalMethod> localMethods;
     private List<MonitoringDynamic> monitoringDynamics;

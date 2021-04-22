@@ -45,11 +45,6 @@ public class SASUController {
         return service.getProcessRegions(request);
     }
 
-    @RequestMapping("/process-regions/top-cpv2")
-    public ProcessRegionsCpvResponse processRegionsTopCpv2ByTendersCount(@Validated ProcessRegionsRequest request) {
-        return service.getProcessRegionsTopCpv2(request);
-    }
-
     @RequestMapping("/process-methods")
     public ProcessMethodsResponse processMethods(@Validated ProcessMethodsRequest request) {
         return service.getProcessMethods(request);
@@ -63,6 +58,11 @@ public class SASUController {
     @RequestMapping("/results-results")
     public ResultsResponse results(@Validated ResultsRequest request) {
         return service.getResults(request);
+    }
+
+    @RequestMapping("/results-offices")
+    public ResultsOfficesResponse resultsOffices(@Validated ResultsOfficesRequest request) {
+        return service.getResultsOffices(request);
     }
 
 

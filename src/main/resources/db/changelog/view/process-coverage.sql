@@ -13,12 +13,11 @@ SELECT t.id             AS tender_id,
        m.id IS NOT NULL AS has_monitoring,
        p.id             AS procuring_entity_id,
        r.id             AS region_id,
-       a.id             AS award_id,
-       a.value          AS award_value,
+       (SELECT COUNT(a.id) FROM award a  WHERE a.tender_id = t.id) AS awards_count,
+       (SELECT SUM(a.value) FROM award a  WHERE a.tender_id = t.id) AS awards_value,
        m.start_date     AS monitoring_start_date,
        m.result         AS monitoring_result
 FROM tender AS t
          JOIN procuring_entity AS p ON p.id = t.procuring_entity_id
          JOIN region AS r ON r.id = p.region_id
-         LEFT JOIN award AS a ON t.id = a.tender_id
          LEFT JOIN monitoring AS m ON t.id = m.tender_id;

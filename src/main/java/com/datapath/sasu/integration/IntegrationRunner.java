@@ -10,8 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import static com.datapath.sasu.Constants.MONITORING_START;
-
 @Component
 @AllArgsConstructor
 @Slf4j
@@ -24,15 +22,15 @@ public class IntegrationRunner {
     @Autowired
     private ThreadPoolTaskExecutor applicationTaskExecutor;
 
-    @Scheduled(fixedDelay = 43_200_000)
-    public void loadOldTenders() {
-
-        int queueSize = applicationTaskExecutor.getThreadPoolExecutor().getQueue().size();
-        if (queueSize < 300) {
-            feedLoader.load();
-            monitoringLoader.load(MONITORING_START.toLocalDateTime());
-        }
-    }
+//    @Scheduled(fixedDelay = 43_200_000)
+//    public void loadOldTenders() {
+//
+//        int queueSize = applicationTaskExecutor.getThreadPoolExecutor().getQueue().size();
+//        if (queueSize < 300) {
+//            feedLoader.load();
+//            monitoringLoader.load(MONITORING_START.toLocalDateTime());
+//        }
+//    }
 
     @Scheduled(fixedDelay = 20_000)
     public void printQueue() {

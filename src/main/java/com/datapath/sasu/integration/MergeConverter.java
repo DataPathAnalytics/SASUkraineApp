@@ -15,12 +15,12 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.datapath.sasu.Constants.OPEN_METHOD_TYPES;
 import static com.datapath.sasu.Constants.UA_ZONE;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -28,6 +28,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class MergeConverter implements Converter {
 
     public static final String YEAR_MONTH_FORMAT = "yyyy-MM";
+    public static final String SAS_ROLE = "sas";
 
     @Autowired
     private DAO dao;
@@ -46,6 +47,9 @@ public class MergeConverter implements Converter {
         daoTender.setLocalMethod(tenderAPI.getProcurementMethodType());
         daoTender.setStartDate(LocalDate.parse(tenderAPI.getTenderID().substring(3, 13)));
 
+        Double tenderExpectedValue = variableProcessor.getTenderExpectedValue(tenderAPI);
+        daoTender.setExpectedValue(tenderExpectedValue);
+
         ProcurementCategory procurementCategory = dao.getProcurementCategory(tenderAPI.getMainProcurementCategory());
         daoTender.setProcurementCategory(procurementCategory);
 
@@ -54,10 +58,6 @@ public class MergeConverter implements Converter {
 
         mergeAwards(tenderAPI, daoTender);
         mergeItems(tenderAPI, daoTender);
-
-
-        Double tenderExpectedValue = variableProcessor.getTenderExpectedValue(tenderAPI);
-        daoTender.setExpectedValue(tenderExpectedValue);
 
         Double tenderValue = variableProcessor.getTenderValue(daoTender);
         daoTender.setValue(tenderValue);
@@ -100,6 +100,9 @@ public class MergeConverter implements Converter {
             }
         });
         tenderEntity.getAwards().removeIf(award -> !"active".equals(award.getStatus()));
+        tenderEntity.getAwards().removeIf(award -> award.getValue() == null);
+        tenderEntity.getAwards().removeIf(award -> award.getValue() == 0);
+        tenderEntity.getAwards().removeIf(award -> award.getValue() > tenderEntity.getExpectedValue());
     }
 
     private void mergeItems(TenderAPI tenderAPI, Tender tenderEntity) {
@@ -138,22 +141,23 @@ public class MergeConverter implements Converter {
         monitoringEntity.setTender(dao.getTender(monitoringAPI.getTenderId()).orElseThrow(() -> new EntityNotFoundException("Monitoring tender not found")));
 
         ConclusionAPI conclusion = monitoringAPI.getConclusion();
-        if (conclusion != null) {
-            if (!isEmpty(conclusion.getViolationType())) {
-                List<Violation> violations = conclusion.getViolationType()
-                        .stream()
-                        .map(violationName -> dao.getViolation(violationName)
-                                .orElse(new Violation(violationName)))
-                        .collect(toList());
+        if (conclusion != null && !isEmpty(conclusion.getViolationType())) {
+            List<Violation> violations = conclusion.getViolationType()
+                    .stream()
+                    .map(violationName -> dao.getViolation(violationName)
+                            .orElse(new Violation(violationName)))
+                    .collect(toList());
 
-                monitoringEntity.getViolations().clear();
-                monitoringEntity.getViolations().addAll(violations);
-            }
-
+            monitoringEntity.getViolations().clear();
+            monitoringEntity.getViolations().addAll(violations);
         }
 
         if (!isEmpty(monitoringAPI.getParties())) {
-            Party auditorAPI = monitoringAPI.getParties().stream().max(Comparator.comparing(Party::getDatePublished)).orElse(null);
+
+            Party auditorAPI = monitoringAPI.getParties().stream()
+                    .filter(party -> party.getRoles() != null && party.getRoles().contains(SAS_ROLE))
+                    .max(comparing(Party::getDatePublished)).orElse(null);
+
             if (auditorAPI != null) {
                 Auditor auditorEntity = dao.getAuditor(auditorAPI.getContactPoint().getEmail()).orElse(new Auditor());
                 auditorEntity.setEmail(auditorAPI.getContactPoint().getEmail());

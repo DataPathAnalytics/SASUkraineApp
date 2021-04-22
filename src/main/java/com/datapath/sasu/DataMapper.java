@@ -19,7 +19,6 @@ public interface DataMapper {
 
     ProcessRegionsDAORequest map(ProcessRegionsRequest request);
 
-    ProcessRegionsCpvResponse map(ProcessRegionsCpvDAOResponse dao);
 
     ProcessMethodsDAORequest map(ProcessMethodsRequest request);
 
@@ -34,4 +33,8 @@ public interface DataMapper {
     ResultsDAORequest map(ResultsRequest request);
 
     ResultsResponse map(ResultsDAOResponse daoResponse);
+
+    ResultsOfficesDAORequest map(ResultsOfficesRequest request);
+
+    ResultsOfficesResponse map(ResultsOfficesDAOResponse daoResponse);
 }

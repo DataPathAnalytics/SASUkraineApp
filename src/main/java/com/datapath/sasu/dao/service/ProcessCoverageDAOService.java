@@ -21,7 +21,7 @@ public class ProcessCoverageDAOService {
     private static final String PERIOD_FILTER;
 
     static {
-        PERIOD_FILTER = "( (tender_start_date >= ? AND tender_status IN ('complete', 'unsuccessful', 'cancelled')) " +
+        PERIOD_FILTER = "( (tender_date >= ? AND tender_start_date < ? AND tender_status IN ('complete', 'unsuccessful', 'cancelled')) " +
                 "   OR (tender_start_date <= ? AND tender_status NOT IN ('complete', 'unsuccessful', 'cancelled')) ) ";
     }
 
@@ -36,7 +36,7 @@ public class ProcessCoverageDAOService {
     }
 
     private Double getTotalAwardsAmount() {
-        String query = "SELECT SUM(award_value) FROM process_coverage";
+        String query = "SELECT SUM(awards_value) FROM process_coverage";
         return jdbcTemplate.queryForObject(query, Double.class);
     }
 
@@ -45,16 +45,16 @@ public class ProcessCoverageDAOService {
         String regionClause = CollectionUtils.isEmpty(request.getRegions()) ? ""
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
 
-        String query = "SELECT SUM(award_value) FROM process_coverage WHERE " + PERIOD_FILTER + regionClause;
-        return jdbcTemplate.queryForObject(query, Double.class, request.getStartDate(), request.getEndDate());
+        String query = "SELECT SUM(awards_value) FROM process_coverage WHERE " + PERIOD_FILTER + regionClause;
+        return jdbcTemplate.queryForObject(query, Double.class, request.getStartDate(), request.getEndDate(), request.getEndDate());
     }
 
     private Integer getAwardsCount(ProcessCoverageDAORequest request) {
         String regionClause = CollectionUtils.isEmpty(request.getRegions()) ? ""
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
 
-        String query = "SELECT COUNT(DISTINCT award_id) FROM process_coverage WHERE " + PERIOD_FILTER + regionClause;
-        return jdbcTemplate.queryForObject(query, Integer.class, request.getStartDate(), request.getEndDate());
+        String query = "SELECT COUNT(DISTINCT awards_count) FROM process_coverage WHERE " + PERIOD_FILTER + regionClause;
+        return jdbcTemplate.queryForObject(query, Integer.class, request.getStartDate(), request.getEndDate(), request.getEndDate());
     }
 
     private TendersDistribution getDistribution(ProcessCoverageDAORequest request) {
@@ -72,10 +72,10 @@ public class ProcessCoverageDAOService {
                 "       FILTER ( WHERE tender_status IN ('cancelled', 'unsuccessful') )                 AS cancelled_procuring_entity_count,\n" +
                 "       COUNT(DISTINCT procuring_entity_id)\n" +
                 "       FILTER ( WHERE tender_status NOT IN ('complete', 'unsuccessful', 'cancelled') ) AS others_procuring_entity_count,\n" +
-                "       SUM(DISTINCT tender_id) FILTER ( WHERE tender_status = 'complete' )             AS complete_tenders_amount,\n" +
-                "       SUM(DISTINCT tender_id)\n" +
+                "       SUM(tender_expected_value) FILTER ( WHERE tender_status = 'complete' )             AS complete_tenders_amount,\n" +
+                "       SUM(tender_expected_value)\n" +
                 "       FILTER ( WHERE tender_status IN ('cancelled', 'unsuccessful') )                 AS cancelled_tenders_amount,\n" +
-                "       SUM(DISTINCT tender_id)\n" +
+                "       SUM(tender_expected_value)\n" +
                 "       FILTER ( WHERE tender_status NOT IN ('complete', 'unsuccessful', 'cancelled') ) AS others_tenders_amount,\n" +
                 "       COUNT(DISTINCT tender_id)                                                       AS tenders_count,\n" +
                 "       SUM(tender_expected_value)                                                      AS tenders_amount,\n" +
@@ -113,7 +113,7 @@ public class ProcessCoverageDAOService {
                 "       FILTER (WHERE monitoring_result IN ('cancelled', 'stopped') )                   AS cancelled_monitoring_procuring_entity_count\n" +
                 "FROM process_coverage WHERE " + PERIOD_FILTER + regionClause;
 
-        return jdbcTemplate.queryForObject(query, newInstance(TendersDistribution.class), request.getStartDate(), request.getEndDate());
+        return jdbcTemplate.queryForObject(query, newInstance(TendersDistribution.class), request.getStartDate(), request.getEndDate(), request.getEndDate());
     }
 
 }

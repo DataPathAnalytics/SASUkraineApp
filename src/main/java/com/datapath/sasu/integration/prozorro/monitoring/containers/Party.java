@@ -5,6 +5,7 @@ import com.datapath.sasu.integration.prozorro.containers.ContactPointAPI;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 public class Party {
@@ -13,5 +14,6 @@ public class Party {
     private ZonedDateTime datePublished;
     private ContactPointAPI contactPoint;
     private AddressAPI address;
+    private List<String> roles;
 
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -60,11 +59,15 @@ public class ProcessMarketDAOService {
     }
 
     private List<Cpv> getTopCpv2ByTendersCount(ProcessMarketDAORequest request, Integer categoryId) {
+
+        String regionClause = isEmpty(request.getRegions()) ? ""
+                : String.format(" AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
+
         String query = "SELECT  cpv2 AS code, " +
                 "(SELECT name FROM cpv_catalogue WHERE cpv = pm.cpv2), " +
                 " COUNT(DISTINCT tender_id) AS tenders_count " +
                 "FROM process_market pm " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" + regionClause +
                 "GROUP BY  cpv2 " +
                 "ORDER BY tenders_count DESC LIMIT 5";
 
@@ -72,11 +75,15 @@ public class ProcessMarketDAOService {
     }
 
     private List<Cpv> getTopCpv2ByAmount(ProcessMarketDAORequest request, Integer categoryId) {
+
+        String regionClause = isEmpty(request.getRegions()) ? ""
+                : String.format(" AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
+
         String query = "SELECT  cpv2 AS code," +
                 "(SELECT name FROM cpv_catalogue WHERE cpv = pm.cpv2)," +
                 " SUM(tender_expected_value) AS amount " +
                 "FROM process_market pm " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" + regionClause +
                 "GROUP BY  cpv2 " +
                 "ORDER BY amount DESC LIMIT 5";
 
@@ -91,7 +98,7 @@ public class ProcessMarketDAOService {
                 "(SELECT name FROM cpv_catalogue WHERE cpv = pm.cpv3),\n" +
                 " COUNT(DISTINCT tender_id) AS tenders_count\n" +
                 "FROM process_market pm " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? AND category_id = ?" + regionClause +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? AND category_id = ? AND cpv3 <> 'undefined' " + regionClause +
                 "GROUP BY  cpv3 " +
                 "ORDER BY tenders_count DESC LIMIT 5";
 
@@ -106,7 +113,7 @@ public class ProcessMarketDAOService {
                 "(SELECT name FROM cpv_catalogue WHERE cpv = pm.cpv3),\n" +
                 " SUM(tender_expected_value) AS amount " +
                 "FROM process_market pm " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? AND category_id = ? " + regionClause +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? AND category_id = ?  AND cpv3 <> 'undefined' " + regionClause +
                 "GROUP BY cpv3 " +
                 "ORDER BY amount DESC LIMIT 5";
 
@@ -145,7 +152,7 @@ public class ProcessMarketDAOService {
     }
 
     private Integer getCpvCount() {
-        String sql = "SELECT COUNT(DISTINCT cpv_id) FROM process_market";
+        String sql = "SELECT COUNT(DISTINCT cpv_id) FROM process_market WHERE has_monitoring";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
@@ -187,7 +194,7 @@ public class ProcessMarketDAOService {
 
         String query = "SELECT category_id AS id, category_name AS name,COUNT(DISTINCT tender_id) AS tendersCount, SUM(tender_expected_value) AS amount\n " +
                 "FROM process_market\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? "+ regionClause +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) AND cpv2 = ? " + regionClause +
                 "GROUP BY category_id,category_name";
 
         return jdbcTemplate.query(query, newInstance(Category.class), request.getStartDate(), request.getEndDate(), request.getCpv2());
@@ -198,7 +205,7 @@ public class ProcessMarketDAOService {
                 : String.format(" AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
 
         String query = "SELECT cpv2,monitoring_start_month     AS date,\n" +
-                "       COUNT(tender_id)           AS tendersCount,\n" +
+                "       COUNT(DISTINCT tender_id)           AS tendersCount,\n" +
                 "       SUM(tender_expected_value) AS amount\n" +
                 "FROM process_market\n" +
                 "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
@@ -208,9 +215,13 @@ public class ProcessMarketDAOService {
     }
 
     private List<Category> getCategories(ProcessMarketDAORequest request) {
+
+        String regionClause = isEmpty(request.getRegions()) ? ""
+                : String.format(" AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
+
         String query = "SELECT category_id AS id, category_name AS name, COUNT(DISTINCT tender_id) AS tendersCount, SUM(tender_expected_value) AS amount\n" +
                 "FROM process_market\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
                 "GROUP BY category_id,category_name";
 
         return jdbcTemplate.query(query, newInstance(Category.class), request.getStartDate(), request.getEndDate());
@@ -218,13 +229,17 @@ public class ProcessMarketDAOService {
     }
 
     public Cpv getCpv2(ProcessMarketDAORequest request, Integer categoryId) {
+
+        String regionClause = isEmpty(request.getRegions()) ? ""
+                : String.format(" AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
+
         return jdbcTemplate.queryForObject("SELECT cpv2 AS code, " +
                 "       (SELECT name FROM cpv_catalogue WHERE cpv = pm.cpv2) AS name, " +
                 "       category_id, " +
                 "       COUNT(DISTINCT tender_id)                               tenders_count, " +
                 "       SUM(tender_expected_value)                              amount " +
                 "FROM process_market pm " +
-                "WHERE cpv2 = ? AND (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" +
+                "WHERE cpv2 = ? AND (monitoring_start_date >= ? AND monitoring_start_date < ?) AND category_id = ?" + regionClause +
                 "GROUP BY cpv2,category_id", newInstance(Cpv.class), request.getCpv2(), request.getStartDate(), request.getEndDate(), categoryId);
     }
 

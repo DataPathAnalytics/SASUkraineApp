@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.jdbc.core.BeanPropertyRowMapper.newInstance;
@@ -19,6 +20,8 @@ public class HomeDAOService {
 
     public HomeDAOResponse getResponse() {
         HomeDAOResponse response = new HomeDAOResponse();
+        //fixme save date anywhere after recalculate views
+        response.setUpdatedDate(LocalDate.now().minusDays(1));
 
         List<ProcuringEntity> top20ProcuringEntities = getTop20ProcuringEntities();
         List<DateInteger> tendersDynamic = getTendersDynamic();
@@ -38,10 +41,10 @@ public class HomeDAOService {
     }
 
     private List<ProcuringEntity> getTop20ProcuringEntities() {
-        String sql = "SELECT procuring_entity_id AS outer_id, procuring_entity_name AS name, SUM(tender_value) AS amount\n" +
+        String sql = "SELECT SUBSTR(procuring_entity_outer_id,7) AS outer_id, procuring_entity_name AS name, SUM(tender_expected_value) AS amount\n" +
                 "FROM home\n" +
                 "WHERE monitoring_result IN ('addressed', 'completed')\n" +
-                "GROUP BY procuring_entity_id,procuring_entity_name\n" +
+                "GROUP BY procuring_entity_outer_id,procuring_entity_name\n" +
                 "ORDER BY amount DESC\n" +
                 "LIMIT 20";
         return jdbcTemplate.query(sql, newInstance(ProcuringEntity.class));
@@ -56,7 +59,7 @@ public class HomeDAOService {
     }
 
     private List<DateInteger> getViolationsDynamic() {
-        String sql = "SELECT monitoring_start_month AS date, COUNT( violation_id) AS value \n" +
+        String sql = "SELECT monitoring_start_month AS date, SUM(violations_count) AS value \n" +
                 "FROM home\n" +
                 "GROUP BY monitoring_start_month\n" +
                 "ORDER BY monitoring_start_month";
@@ -64,7 +67,7 @@ public class HomeDAOService {
     }
 
     private Long getTendersAmount() {
-        String sql = "SELECT SUM(tender_value) FROM home";
+        String sql = "SELECT SUM(tender_expected_value) FROM home";
         return jdbcTemplate.queryForObject(sql, Long.class);
     }
 
@@ -84,7 +87,7 @@ public class HomeDAOService {
     }
 
     private Integer getViolationsCount() {
-        String sql = "SELECT COUNT(violation_id) FROM home WHERE monitoring_result IN ('addressed', 'completed')";
+        String sql = "SELECT SUM(violations_count) FROM home WHERE monitoring_result IN ('addressed', 'completed')";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 }

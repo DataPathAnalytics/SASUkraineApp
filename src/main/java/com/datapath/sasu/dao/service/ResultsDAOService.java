@@ -57,8 +57,7 @@ public class ResultsDAOService {
                 "       COUNT(DISTINCT tender_id)               AS tenders_count,\n" +
                 "       COALESCE(SUM(tender_expected_value), 0) AS amount\n" +
                 "FROM region r\n" +
-                "         LEFT JOIN results_results rr ON r.id = rr.region_id\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " +
+                " LEFT JOIN results_results rr ON r.id = rr.region_id AND (monitoring_start_date >= ? AND monitoring_start_date < ?) " +
                 "GROUP BY r.id;";
 
         return jdbcTemplate.query(query, newInstance(Region.class), request.getStartDate(), request.getEndDate());

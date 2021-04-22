@@ -30,6 +30,9 @@ public class SasuWebService {
     @Autowired
     private ResultsDAOService resultsDAOService;
     @Autowired
+    private ResultsOfficesDAOService resultsOfficesDAOService;
+
+    @Autowired
     private DataMapper mapper;
 
     public HomeResponse getHome() {
@@ -94,12 +97,6 @@ public class SasuWebService {
         return mapper.map(daoResponse);
     }
 
-    public ProcessRegionsCpvResponse getProcessRegionsTopCpv2(ProcessRegionsRequest request) {
-        ProcessRegionsDAORequest daoRequest = mapper.map(request);
-        ProcessRegionsCpvDAOResponse daoResponse = processRegionsDAOService.getTopCpv2(daoRequest);
-        return mapper.map(daoResponse);
-    }
-
     public ProcessMethodsResponse getProcessMethods(ProcessMethodsRequest request) {
         ProcessMethodsDAORequest daoRequest = mapper.map(request);
         ProcessMethodsDAOResponse daoResponse = processMethodsDAOService.getResponse(daoRequest);
@@ -115,6 +112,12 @@ public class SasuWebService {
     public ResultsResponse getResults(ResultsRequest request) {
         ResultsDAORequest daoRequest = mapper.map(request);
         ResultsDAOResponse daoResponse = resultsDAOService.getResponse(daoRequest);
+        return mapper.map(daoResponse);
+    }
+
+    public ResultsOfficesResponse getResultsOffices(ResultsOfficesRequest request) {
+        ResultsOfficesDAORequest daoRequest = mapper.map(request);
+        ResultsOfficesDAOResponse daoResponse = resultsOfficesDAOService.getResponse(daoRequest);
         return mapper.map(daoResponse);
     }
 }
