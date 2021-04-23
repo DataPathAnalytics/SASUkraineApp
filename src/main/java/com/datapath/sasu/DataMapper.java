@@ -37,4 +37,8 @@ public interface DataMapper {
     ResultsOfficesDAORequest map(ResultsOfficesRequest request);
 
     ResultsOfficesResponse map(ResultsOfficesDAOResponse daoResponse);
+
+    ResultsViolationsDAORequest map(ResultsViolationsRequest request);
+
+    ResultsViolationsResponse map(ResultsViolationsDAOResponse daoResponse);
 }

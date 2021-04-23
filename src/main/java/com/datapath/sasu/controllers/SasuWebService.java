@@ -31,6 +31,8 @@ public class SasuWebService {
     private ResultsDAOService resultsDAOService;
     @Autowired
     private ResultsOfficesDAOService resultsOfficesDAOService;
+    @Autowired
+    private ResultsViolationsDAOService resultsViolationsDAOService;
 
     @Autowired
     private DataMapper mapper;
@@ -59,10 +61,12 @@ public class SasuWebService {
     public ResourcesDynamicsResponse getResourcesDynamics(ResourcesDynamicsRequest request) {
         ResourcesDynamicsResponse response = new ResourcesDynamicsResponse();
 
-        response.setTotalMonitoringTenderPercent(resourcesDynamicsDAOService.getTotalMonitoringTenderPercent());
-        response.setMonitoringTenderPercent(resourcesDynamicsDAOService.getMonitoringTenderPercent(
+        response.setTotalMonitoringTenderPercent(Math.round(resourcesDynamicsDAOService.getTotalMonitoringTenderPercent()));
+        response.setTotalMonitoringTenders(resourcesDynamicsDAOService.getTotalMonitoringTenders());
+
+        response.setMonitoringTenderPercent(Math.round(resourcesDynamicsDAOService.getMonitoringTenderPercent(
                 request.getStartDate(), request.getEndDate(), request.getRegions()
-        ));
+        )));
 
         response.setDynamicTenders(resourcesDynamicsDAOService.getDynamicTenders(
                 request.getStartDate(), request.getEndDate(), request.getRegions())
@@ -120,4 +124,11 @@ public class SasuWebService {
         ResultsOfficesDAOResponse daoResponse = resultsOfficesDAOService.getResponse(daoRequest);
         return mapper.map(daoResponse);
     }
+
+    public ResultsViolationsResponse getResultsViolations(ResultsViolationsRequest request) {
+        ResultsViolationsDAORequest daoRequest = mapper.map(request);
+        ResultsViolationsDAOResponse daoResponse = resultsViolationsDAOService.getResponse(daoRequest);
+        return mapper.map(daoResponse);
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.datapath.sasu.Constants.MONITORING_START;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
 
@@ -27,14 +28,17 @@ public class ResourcesDynamicsDAOService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Integer getTotalMonitoringTenderPercent() {
+    public Double getTotalMonitoringTenderPercent() {
+        LocalDate startDate = MONITORING_START.toLocalDate();
+        LocalDate endDate = LocalDate.now().withDayOfMonth(1);
         return jdbcTemplate.queryForObject(
                 "SELECT\n" +
                         "SUM(tender_expected_value) FILTER ( WHERE has_monitoring ) * 100 / SUM (tender_expected_value)\n" +
-                        "FROM resources_dynamics", Integer.class);
+                        "FROM resources_dynamics WHERE " + PERIOD_FILTER,
+                Double.class, startDate, endDate, endDate);
     }
 
-    public Integer getMonitoringTenderPercent(LocalDate startDate, LocalDate endDate, List<Integer> regionIds) {
+    public Double getMonitoringTenderPercent(LocalDate startDate, LocalDate endDate, List<Integer> regionIds) {
 
         String regionClause = isEmpty(regionIds) ? ""
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(regionIds));
@@ -43,7 +47,7 @@ public class ResourcesDynamicsDAOService {
                 "SELECT\n" +
                         "SUM(tender_expected_value) FILTER ( WHERE has_monitoring " + regionClause + ") * 100 / SUM(tender_expected_value)\n" +
                         "FROM resources_dynamics WHERE " + PERIOD_FILTER,
-                Integer.class, startDate, endDate, endDate);
+                Double.class, startDate, endDate, endDate);
     }
 
     public List<DynamicTender> getDynamicTenders(LocalDate startDate, LocalDate endDate, List<Integer> regionIds) {
@@ -75,6 +79,11 @@ public class ResourcesDynamicsDAOService {
                 "FROM resources_dynamics\n" +
                 "        WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
                 "GROUP BY monitoring_start_month", new BeanPropertyRowMapper<>(DynamicProductivity.class), startDate, endDate);
+    }
+
+    public Integer getTotalMonitoringTenders() {
+        String query = "SELECT COUNT(DISTINCT tender_id) FROM resources_dynamics WHERE has_monitoring";
+        return jdbcTemplate.queryForObject(query, Integer.class);
     }
 
 }

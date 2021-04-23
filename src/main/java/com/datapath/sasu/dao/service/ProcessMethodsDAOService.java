@@ -26,6 +26,7 @@ public class ProcessMethodsDAOService {
         ProcessMethodsDAOResponse response = new ProcessMethodsDAOResponse();
 
         response.setProcedureMonitoringCoverage(getProcedureMonitoringCoverage());
+        response.setMonitoringProcuringEntities(getMonitoringProcuringEntities());
         response.setTendersCount(getTendersCount(request));
         response.setTendersAmount(getTendersAmount(request));
         response.setProcuringEntityCount(getProcuringEntityCount(request));
@@ -35,12 +36,18 @@ public class ProcessMethodsDAOService {
         return response;
     }
 
+    private Double getMonitoringProcuringEntities() {
+        String query = "SELECT COUNT(DISTINCT procuring_entity_id) FILTER ( WHERE has_monitoring ) FROM process_methods";
+        return jdbcTemplate.queryForObject(query, Double.class);
+    }
+
     private Double getProcedureMonitoringCoverage() {
         String query = "SELECT SUM(tender_expected_value) FILTER ( WHERE has_monitoring ) /  SUM (tender_expected_value) * 100\n" +
                 "FROM process_methods";
 
         return jdbcTemplate.queryForObject(query, Double.class);
     }
+
 
     private Integer getTendersCount(ProcessMethodsDAORequest request) {
 

@@ -7,8 +7,9 @@ import java.util.List;
 @Data
 public class ResourcesDynamicsResponse {
 
-    private Integer totalMonitoringTenderPercent;
-    private Integer monitoringTenderPercent;
+    private long totalMonitoringTenderPercent;
+    private int totalMonitoringTenders;
+    private long monitoringTenderPercent;
 
     private List<DynamicTender> dynamicTenders;
     private List<DynamicAuditor> dynamicAuditors;

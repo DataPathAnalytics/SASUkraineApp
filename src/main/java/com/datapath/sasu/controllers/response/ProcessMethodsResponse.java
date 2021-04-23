@@ -8,6 +8,8 @@ import java.util.List;
 public class ProcessMethodsResponse {
 
     private Double procedureMonitoringCoverage;
+    private Double monitoringProcuringEntities;
+
     private Integer tendersCount;
     private Double tendersAmount;
     private Integer procuringEntityCount;
