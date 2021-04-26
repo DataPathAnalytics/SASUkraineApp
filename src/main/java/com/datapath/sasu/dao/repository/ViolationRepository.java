@@ -1,16 +1,12 @@
 package com.datapath.sasu.dao.repository;
 
 import com.datapath.sasu.dao.entity.Violation;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface ViolationRepository extends CrudRepository<Violation, Integer> {
+public interface ViolationRepository extends JpaRepository<Violation, Integer> {
 
     Optional<Violation> findByName(String name);
-
-    @Override
-    List<Violation> findAll();
 
 }
