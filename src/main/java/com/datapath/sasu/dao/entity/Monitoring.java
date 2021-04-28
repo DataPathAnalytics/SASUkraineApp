@@ -45,4 +45,11 @@ public class Monitoring {
             inverseJoinColumns = @JoinColumn(name = "violation_id"))
     private List<Violation> violations = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "monitoring_reason",
+            joinColumns = @JoinColumn(name = "monitoring_id"),
+            inverseJoinColumns = @JoinColumn(name = "reason_id"))
+    private List<Reason> reasons = new ArrayList<>();
+
 }

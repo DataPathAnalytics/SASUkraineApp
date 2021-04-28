@@ -20,5 +20,6 @@ public class MonitoringAPI {
     private ConclusionAPI conclusion;
 
     private List<Party> parties;
+    private List<String> reasons;
 
 }

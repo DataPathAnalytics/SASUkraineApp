@@ -23,6 +23,7 @@ public class DAOImpl implements DAO {
     private final ProcuringEntityRepository procuringEntityRepository;
     private final TenderRepository tenderRepository;
     private final ViolationRepository violationRepository;
+    private final ReasonRepository reasonRepository;
     private final RegionRepository regionRepository;
     private final AuditorRepository auditorRepository;
     private final OfficeRepository officeRepository;
@@ -80,6 +81,11 @@ public class DAOImpl implements DAO {
     @Override
     public Optional<Violation> getViolation(String violationName) {
         return violationRepository.findByName(violationName);
+    }
+
+    @Override
+    public Optional<Reason> getReason(String reasonName) {
+        return reasonRepository.findByName(reasonName);
     }
 
     @Override

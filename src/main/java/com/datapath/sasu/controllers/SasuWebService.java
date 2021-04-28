@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 public class SasuWebService {
 
     @Autowired
+    private DataMapper mapper;
+    @Autowired
+    private MappingDAOService mappingDAOService;
+    @Autowired
     private HomeDAOService homeDAOService;
     @Autowired
     private ResourcesDasuGeographyDAOService geographyDAOService;
@@ -33,9 +37,13 @@ public class SasuWebService {
     private ResultsOfficesDAOService resultsOfficesDAOService;
     @Autowired
     private ResultsViolationsDAOService resultsViolationsDAOService;
-
     @Autowired
-    private DataMapper mapper;
+    private ResultsSourcesDAOService resultsSourcesDAOService;
+
+    public MappingResponse getMappings() {
+        MappingDAOResponse daoresponse = mappingDAOService.getResponse();
+        return mapper.map(daoresponse);
+    }
 
     public HomeResponse getHome() {
         HomeDAOResponse daoResponse = homeDAOService.getResponse();
@@ -43,7 +51,7 @@ public class SasuWebService {
     }
 
     public ResourcesDASUGeographyResponse getResourcesDASUGeography(ResourcesDASUGeographyRequest request) {
-        ResourcesDASUGeographyResponse response = new ResourcesDASUGeographyResponse();
+        var response = new ResourcesDASUGeographyResponse();
 
         response.setTotalAuditorsCount(geographyDAOService.getTotalAuditorsCount());
 
@@ -59,7 +67,7 @@ public class SasuWebService {
     }
 
     public ResourcesDynamicsResponse getResourcesDynamics(ResourcesDynamicsRequest request) {
-        ResourcesDynamicsResponse response = new ResourcesDynamicsResponse();
+        var response = new ResourcesDynamicsResponse();
 
         response.setTotalMonitoringTenderPercent(Math.round(resourcesDynamicsDAOService.getTotalMonitoringTenderPercent()));
         response.setTotalMonitoringTenders(resourcesDynamicsDAOService.getTotalMonitoringTenders());
@@ -128,6 +136,12 @@ public class SasuWebService {
     public ResultsViolationsResponse getResultsViolations(ResultsViolationsRequest request) {
         ResultsViolationsDAORequest daoRequest = mapper.map(request);
         ResultsViolationsDAOResponse daoResponse = resultsViolationsDAOService.getResponse(daoRequest);
+        return mapper.map(daoResponse);
+    }
+
+    public ResultsSourcesResponse getResultsSources(ResultsSourcesRequest request) {
+        ResultsSourcesDAORequest daoRequest = mapper.map(request);
+        ResultsSourcesDAOResponse daoResponse = resultsSourcesDAOService.getResponse(daoRequest);
         return mapper.map(daoResponse);
     }
 

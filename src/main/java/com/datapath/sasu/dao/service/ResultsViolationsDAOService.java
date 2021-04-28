@@ -1,6 +1,5 @@
 package com.datapath.sasu.dao.service;
 
-import com.datapath.sasu.dao.repository.OfficeRepository;
 import com.datapath.sasu.dao.request.ResultsViolationsDAORequest;
 import com.datapath.sasu.dao.response.ResultsViolationsDAOResponse;
 import com.datapath.sasu.dao.response.ResultsViolationsDAOResponse.Region;
@@ -21,7 +20,6 @@ import static org.springframework.util.StringUtils.collectionToCommaDelimitedStr
 public class ResultsViolationsDAOService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final OfficeRepository officeRepository;
 
     @Transactional
     public ResultsViolationsDAOResponse getResponse(ResultsViolationsDAORequest request) {
@@ -29,7 +27,6 @@ public class ResultsViolationsDAOService {
         response.setTotalProcuringEntitiesCount(getTotalProcuringEntitiesCount());
         response.setProcuringEntitiesCount(getProcuringEntitiesCount(request));
         response.setTendersByViolation(getTendersByViolation(request));
-        response.setOffices(officeRepository.findAll());
         response.setRegions(getRegions(request));
 
         return response;
@@ -52,7 +49,7 @@ public class ResultsViolationsDAOService {
 
     private List<TenderByViolation> getTendersByViolation(ResultsViolationsDAORequest request) {
 
-        String filter = getFilter(request);
+        String filter = getMonitoringDateFilter(request) + getOfficeFilter(request);
 
         String query = "WITH tenders AS (\n" +
                 "    SELECT COUNT(DISTINCT tender_id) count FROM results_violations\n" +
@@ -69,12 +66,18 @@ public class ResultsViolationsDAOService {
 
         String filter = getFilter(request);
 
-        String query = "SELECT procuring_entity_region_id          AS region_id,\n" +
-                "       SUM(tender_expected_value)          AS amount,\n" +
-                "       COUNT(DISTINCT tender_id)           AS tenders_count,\n" +
-                "       COUNT(DISTINCT procuring_entity_id) AS procuring_entities_count\n" +
-                "FROM results_violations WHERE TRUE " + filter +
-                "GROUP BY procuring_entity_region_id";
+        String query = "WITH entity_regions AS (\n" +
+                "    SELECT procuring_entity_region_id          AS region_id,\n" +
+                "           SUM(tender_expected_value)          AS amount,\n" +
+                "           COUNT(DISTINCT tender_id)           AS tenders_count,\n" +
+                "           COUNT(DISTINCT procuring_entity_id) AS procuring_entities_count\n" +
+                "    FROM results_violations rv\n" +
+                "    WHERE procuring_entity_region_id IS NOT NULL " + filter +
+                "    GROUP BY procuring_entity_region_id\n" +
+                ")\n" +
+                "SELECT r.id AS region_id, er.amount, er.tenders_count, er.procuring_entities_count\n" +
+                "FROM region r\n" +
+                "         LEFT JOIN entity_regions er ON r.id = er.region_id";
         return jdbcTemplate.query(query, newInstance(Region.class));
     }
 

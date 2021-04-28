@@ -81,5 +81,47 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="7" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="reason"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="reason">
+            <column name="id" type="serial" autoIncrement="true"/>
+            <column name="name" type="text"/>
+        </createTable>
+
+        <addPrimaryKey tableName="reason" columnNames="id"/>
+        <addUniqueConstraint tableName="reason" columnNames="name"/>
+
+    </changeSet>
+
+    <changeSet id="8" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="monitoring_reason"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="monitoring_reason">
+            <column name="monitoring_id" type="integer"/>
+            <column name="reason_id" type="integer"/>
+        </createTable>
+
+        <addPrimaryKey tableName="monitoring_reason" columnNames="monitoring_id,reason_id"/>
+
+        <addForeignKeyConstraint baseTableName="monitoring_reason" baseColumnNames="monitoring_id"
+                                 constraintName="fk_monitoring_reason_to_monitoring"
+                                 referencedTableName="monitoring"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="monitoring_reason" baseColumnNames="reason_id"
+                                 constraintName="fk_monitoring_reason_to_reason"
+                                 referencedTableName="reason"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 
 </databaseChangeLog>

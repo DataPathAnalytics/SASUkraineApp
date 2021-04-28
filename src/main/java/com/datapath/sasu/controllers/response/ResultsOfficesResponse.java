@@ -11,7 +11,6 @@ public class ResultsOfficesResponse {
     private Double tendersAmount;
     private List<Office> offices;
     private List<TenderDynamic> tenderDynamics;
-    private List<ViolationDTO> violations;
 
     @Data
     public static class Office {

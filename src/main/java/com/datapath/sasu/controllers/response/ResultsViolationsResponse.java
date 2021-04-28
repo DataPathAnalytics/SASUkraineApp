@@ -11,7 +11,6 @@ public class ResultsViolationsResponse {
     private Integer totalProcuringEntitiesCount;
     private Integer procuringEntitiesCount;
     private List<TenderByViolation> tendersByViolation;
-    private List<OfficeDTO> offices;
     private List<Region> regions;
 
     @Data
@@ -24,9 +23,9 @@ public class ResultsViolationsResponse {
     @Data
     public static class Region {
         private Integer regionId;
-        private Integer tendersCount;
-        private Double amount;
-        private Integer procuringEntitiesCount;
+        private int tendersCount;
+        private double amount;
+        private int procuringEntitiesCount;
     }
 
 }

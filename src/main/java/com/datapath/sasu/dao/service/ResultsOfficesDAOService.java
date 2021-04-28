@@ -1,6 +1,5 @@
 package com.datapath.sasu.dao.service;
 
-import com.datapath.sasu.dao.repository.ViolationRepository;
 import com.datapath.sasu.dao.request.ResultsOfficesDAORequest;
 import com.datapath.sasu.dao.response.ResultsOfficesDAOResponse;
 import com.datapath.sasu.dao.response.ResultsOfficesDAOResponse.Office;
@@ -19,17 +18,15 @@ import static org.springframework.jdbc.core.BeanPropertyRowMapper.newInstance;
 public class ResultsOfficesDAOService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final ViolationRepository violationRepository;
 
     @Transactional
     public ResultsOfficesDAOResponse getResponse(ResultsOfficesDAORequest request) {
-        ResultsOfficesDAOResponse response = new ResultsOfficesDAOResponse();
+        var response = new ResultsOfficesDAOResponse();
 
         response.setAvgOfficeViolations(getAvgOfficeViolations());
         response.setTendersAmount(getTendersAmount(request));
         response.setOffices(getOffices(request));
         response.setTenderDynamics(getTenderDynamic(request));
-        response.setViolations(violationRepository.findAll());
 
         return response;
     }

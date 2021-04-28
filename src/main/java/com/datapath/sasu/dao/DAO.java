@@ -28,6 +28,8 @@ public interface DAO {
 
     Optional<Violation> getViolation(String violationName);
 
+    Optional<Reason> getReason(String reasonName);
+
     Region getRegion(String alias);
 
     Optional<Auditor> getAuditor(String email);

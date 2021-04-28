@@ -16,6 +16,11 @@ public class SASUController {
 
     private SasuWebService service;
 
+    @GetMapping("/mappings")
+    public MappingResponse mappings() {
+        return service.getMappings();
+    }
+
     @GetMapping("/home")
     public HomeResponse home() {
         return service.getHome();
@@ -69,6 +74,11 @@ public class SASUController {
     @RequestMapping("/results-violations")
     public ResultsViolationsResponse resultsViolations(@Validated ResultsViolationsRequest request) {
         return service.getResultsViolations(request);
+    }
+
+    @RequestMapping("/results-sources")
+    public ResultsSourcesResponse resultsSources(@Validated ResultsSourcesRequest request) {
+        return service.getResultsSources(request);
     }
 
 }

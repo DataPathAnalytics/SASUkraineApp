@@ -38,7 +38,7 @@ public class MergeConverter implements Converter {
     @Override
     public Tender convert(TenderAPI tenderAPI) {
 
-        Tender daoTender = dao.getTender(tenderAPI.getId()).orElse(new Tender());
+        var daoTender = dao.getTender(tenderAPI.getId()).orElse(new Tender());
         daoTender.setHash(tenderAPI.getId());
         daoTender.setOuterId(tenderAPI.getTenderID());
         daoTender.setDateModified(toLocalDateTime(tenderAPI.getDateModified()));
@@ -50,10 +50,10 @@ public class MergeConverter implements Converter {
         Double tenderExpectedValue = variableProcessor.getTenderExpectedValue(tenderAPI);
         daoTender.setExpectedValue(tenderExpectedValue);
 
-        ProcurementCategory procurementCategory = dao.getProcurementCategory(tenderAPI.getMainProcurementCategory());
+        var procurementCategory = dao.getProcurementCategory(tenderAPI.getMainProcurementCategory());
         daoTender.setProcurementCategory(procurementCategory);
 
-        ProcuringEntity procuringEntity = getProcuringEntity(tenderAPI.getProcuringEntity());
+        var procuringEntity = getProcuringEntity(tenderAPI.getProcuringEntity());
         daoTender.setProcuringEntity(procuringEntity);
 
         mergeAwards(tenderAPI, daoTender);
@@ -67,9 +67,9 @@ public class MergeConverter implements Converter {
 
     private ProcuringEntity getProcuringEntity(ProcuringEntityAPI procuringEntityAPI) {
         String outerId = procuringEntityAPI.getIdentifier().getScheme() + procuringEntityAPI.getIdentifier().getId();
-        Region region = dao.getRegion(procuringEntityAPI.getAddress().getRegion());
+        var region = dao.getRegion(procuringEntityAPI.getAddress().getRegion());
 
-        ProcuringEntity procuringEntity = dao.getProcuringEntity(outerId).orElse(new ProcuringEntity());
+        var procuringEntity = dao.getProcuringEntity(outerId).orElse(new ProcuringEntity());
         procuringEntity.setOuterId(outerId);
         procuringEntity.setName(procuringEntityAPI.getIdentifier().getLegalName());
         procuringEntity.setRegion(region);
@@ -81,7 +81,7 @@ public class MergeConverter implements Converter {
         if (isEmpty(tenderAPI.getAwards())) return;
 
         tenderAPI.getAwards().forEach(apiAward -> {
-            Award award = tenderEntity.getAwards().stream()
+            var award = tenderEntity.getAwards().stream()
                     .filter(awardEntity -> awardEntity.getOuterId().equals(apiAward.getId()))
                     .findFirst().orElse(new Award());
 
@@ -131,7 +131,7 @@ public class MergeConverter implements Converter {
     @Override
     public Monitoring convert(MonitoringAPI monitoringAPI) {
 
-        Monitoring monitoringEntity = dao.getMonitoring(monitoringAPI.getId()).orElse(new Monitoring());
+        var monitoringEntity = dao.getMonitoring(monitoringAPI.getId()).orElse(new Monitoring());
         monitoringEntity.setOuterId(monitoringAPI.getId());
         monitoringEntity.setDateModified(toLocalDateTime(monitoringAPI.getDateModified()));
         monitoringEntity.setResult(monitoringAPI.getStatus());
@@ -152,6 +152,15 @@ public class MergeConverter implements Converter {
             monitoringEntity.getViolations().addAll(violations);
         }
 
+        if (!isEmpty(monitoringAPI.getReasons())) {
+            List<Reason> reasons = monitoringAPI.getReasons().stream()
+                    .map(reasonName -> dao.getReason(reasonName).orElse(new Reason(reasonName)))
+                    .collect(toList());
+
+            monitoringEntity.getReasons().clear();
+            monitoringEntity.getReasons().addAll(reasons);
+        }
+
         if (!isEmpty(monitoringAPI.getParties())) {
 
             Party auditorAPI = monitoringAPI.getParties().stream()
@@ -159,12 +168,12 @@ public class MergeConverter implements Converter {
                     .max(comparing(Party::getDatePublished)).orElse(null);
 
             if (auditorAPI != null) {
-                Auditor auditorEntity = dao.getAuditor(auditorAPI.getContactPoint().getEmail()).orElse(new Auditor());
+                var auditorEntity = dao.getAuditor(auditorAPI.getContactPoint().getEmail()).orElse(new Auditor());
                 auditorEntity.setEmail(auditorAPI.getContactPoint().getEmail());
 
                 monitoringEntity.setAuditor(auditorEntity);
 
-                Office office = dao.getOffice(auditorAPI.getName()).orElse(new Office());
+                var office = dao.getOffice(auditorAPI.getName()).orElse(new Office());
                 office.setName(auditorAPI.getName());
 
                 String regionAPI = auditorAPI.getAddress().getRegion();

@@ -41,4 +41,10 @@ public interface DataMapper {
     ResultsViolationsDAORequest map(ResultsViolationsRequest request);
 
     ResultsViolationsResponse map(ResultsViolationsDAOResponse daoResponse);
+
+    ResultsSourcesDAORequest map(ResultsSourcesRequest request);
+
+    ResultsSourcesResponse map(ResultsSourcesDAOResponse daoResponse);
+
+    MappingResponse map(MappingDAOResponse daoresponse);
 }

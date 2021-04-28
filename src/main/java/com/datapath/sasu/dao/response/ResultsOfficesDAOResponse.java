@@ -1,6 +1,5 @@
 package com.datapath.sasu.dao.response;
 
-import com.datapath.sasu.dao.entity.Violation;
 import lombok.Data;
 
 import java.util.List;
@@ -12,7 +11,6 @@ public class ResultsOfficesDAOResponse {
     private Double tendersAmount;
     private List<Office> offices;
     private List<TenderDynamic> tenderDynamics;
-    private List<Violation> violations;
 
     @Data
     public static class Office {
