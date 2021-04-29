@@ -6,4 +6,5 @@ import lombok.Data;
 public class ViolationDTO {
     private Integer id;
     private String name;
+    private String nameUa;
 }

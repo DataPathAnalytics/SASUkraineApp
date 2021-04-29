@@ -123,5 +123,28 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="9" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="name_ua" tableName="reason"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="reason">
+            <column name="name_ua" type="text"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="10" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="name_ua" tableName="violation"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="violation">
+            <column name="name_ua" type="text"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

@@ -71,7 +71,8 @@ public class ResultsDAOService {
                 "       COUNT(DISTINCT tender_id)               AS tenders_count,\n" +
                 "       COALESCE(SUM(tender_expected_value), 0) AS amount\n" +
                 "FROM results_results " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
+                "WHERE monitoring_result IN ('active','addressed', 'complete', 'declined', 'closed') " +
+                "AND (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
                 "GROUP BY monitoring_result";
 
         return jdbcTemplate.query(query, newInstance(Distribution.class), request.getStartDate(), request.getEndDate());
@@ -85,8 +86,9 @@ public class ResultsDAOService {
                 "       monitoring_result,\n" +
                 "       COUNT(DISTINCT tender_id)               AS tenders_count,\n" +
                 "       COALESCE(SUM(tender_expected_value), 0) AS amount\n" +
-                "FROM results_results " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
+                "FROM results_results \n" +
+                "WHERE monitoring_result IN ('addressed', 'complete', 'declined', 'closed') " +
+                "AND (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
                 "GROUP BY monitoring_start_month, monitoring_result";
 
         return jdbcTemplate.query(query, newInstance(Dynamic.class), request.getStartDate(), request.getEndDate());

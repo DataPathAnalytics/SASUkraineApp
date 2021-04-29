@@ -14,14 +14,16 @@ import static javax.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 public class Reason {
 
-    public Reason(String name) {
-        this.name = name;
-    }
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
     private String name;
+    private String nameUa;
+
+    public Reason(String name) {
+        this.name = name;
+        nameUa = name;
+    }
 
 }

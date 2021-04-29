@@ -14,14 +14,15 @@ import static javax.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 public class Violation {
 
-    public Violation(String name) {
-        this.name = name;
-    }
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
-
     private String name;
+    private String nameUa;
+
+    public Violation(String name) {
+        this.name = name;
+        this.nameUa = name;
+    }
 
 }

@@ -58,7 +58,7 @@ public class ResultsViolationsDAOService {
                 "       COUNT(DISTINCT tender_id)                                 AS tenders_count,\n" +
                 "       COUNT(DISTINCT tender_id) * 100 / (SELECT * FROM tenders) AS percent\n" +
                 "FROM results_violations WHERE TRUE " + filter +
-                "GROUP BY violation_id";
+                "GROUP BY violation_id ORDER BY tenders_count DESC";
         return jdbcTemplate.query(query, newInstance(TenderByViolation.class));
     }
 
