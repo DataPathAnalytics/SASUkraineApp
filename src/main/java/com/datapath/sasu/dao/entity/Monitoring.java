@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -24,6 +25,9 @@ public class Monitoring {
 
     private LocalDateTime startDate;
     private String startMonth;
+
+    private Integer duration;
+    private boolean concluded;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "tender_id")
@@ -45,7 +49,7 @@ public class Monitoring {
             inverseJoinColumns = @JoinColumn(name = "violation_id"))
     private List<Violation> violations = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = { MERGE, PERSIST })
     @JoinTable(
             name = "monitoring_reason",
             joinColumns = @JoinColumn(name = "monitoring_id"),

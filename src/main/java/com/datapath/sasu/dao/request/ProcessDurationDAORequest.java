@@ -6,12 +6,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class ResultsSourcesDAORequest {
+public class ProcessDurationDAORequest {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<Integer> offices;
-    private List<Integer> procuringEntityRegions;
-    private List<Integer> reasons;
-    
+    private List<Integer> regions;
+
 }

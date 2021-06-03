@@ -6,4 +6,5 @@ import lombok.Data;
 public class OfficeDTO {
     private Integer id;
     private String name;
+    private String outerName;
 }

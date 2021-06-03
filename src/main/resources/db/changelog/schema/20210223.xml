@@ -147,4 +147,62 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="11" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="duration" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="duration" type="smallint"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="12" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="concluded" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="concluded" type="boolean"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="13" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="competitive" tableName="tender"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="tender">
+            <column name="competitive" type="boolean"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="14" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="region" tableName="case_name"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="region">
+            <column name="case_name" type="text"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="15" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="sasu_office" columnNames="region_id" indexName="unique_region"/>
+            </not>
+        </preConditions>
+
+        <addUniqueConstraint tableName="sasu_office" columnNames="region_id"/>
+    </changeSet>
+
 </databaseChangeLog>

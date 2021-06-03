@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface OfficeRepository extends JpaRepository<Office, Integer> {
     Optional<Office> findByName(String name);
+    Optional<Office> findByRegionId(Integer regionId);
 
 
 }

@@ -34,5 +34,11 @@ public interface DAO {
 
     Optional<Auditor> getAuditor(String email);
 
-    Optional<Office> getOffice(String name);
+    Optional<Office> getOffice(Integer regionId);
+
+    List<Integer> getTendersWithDuplicatedMonitoring();
+
+    List<Monitoring> getTenderMonitoring(Integer tenderId);
+
+    void delete(Monitoring monitoring);
 }

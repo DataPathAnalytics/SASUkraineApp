@@ -12,5 +12,6 @@ public class Region {
     @Id
     private Integer id;
     private String name;
+    private String caseName;
 
 }

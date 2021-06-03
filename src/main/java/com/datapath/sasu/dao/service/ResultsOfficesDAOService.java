@@ -1,6 +1,7 @@
 package com.datapath.sasu.dao.service;
 
 import com.datapath.sasu.dao.request.ResultsOfficesDAORequest;
+import com.datapath.sasu.dao.request.ResultsViolationsDAORequest;
 import com.datapath.sasu.dao.response.ResultsOfficesDAOResponse;
 import com.datapath.sasu.dao.response.ResultsOfficesDAOResponse.Office;
 import com.datapath.sasu.dao.response.ResultsOfficesDAOResponse.TenderDynamic;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.springframework.jdbc.core.BeanPropertyRowMapper.newInstance;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
 
 @Component
 @AllArgsConstructor
@@ -47,10 +50,10 @@ public class ResultsOfficesDAOService {
         String query = "SELECT SUM(tender_expected_value)\n" +
                 "FROM (\n" +
                 "         SELECT DISTINCT ON (tender_id) tender_expected_value\n" +
-                "         FROM results_offices WHERE TRUE " + violationFilter +
+                "         FROM results_offices WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter +
                 "     ) rf";
 
-        return jdbcTemplate.queryForObject(query, Double.class);
+        return jdbcTemplate.queryForObject(query, Double.class,request.getStartDate(),request.getEndDate());
     }
 
     private List<Office> getOffices(ResultsOfficesDAORequest request) {
@@ -74,10 +77,16 @@ public class ResultsOfficesDAOService {
                 "       COUNT(DISTINCT procuring_entity_id) AS procuring_entity_count,\n" +
                 "       SUM(tender_expected_value) AS amount\n" +
                 "FROM results_offices ro\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter + getOfficeFilter(request) +
                 "GROUP BY sasu_office_id, monitoring_start_month";
 
         return jdbcTemplate.query(query, newInstance(TenderDynamic.class), request.getStartDate(), request.getEndDate());
+    }
+
+    private String getOfficeFilter(ResultsOfficesDAORequest request) {
+        List<Integer> offices = request.getOffices();
+        return isEmpty(offices) ? ""
+                : String.format(" AND sasu_office_id IN (%s) ", collectionToCommaDelimitedString(offices));
     }
 
 }

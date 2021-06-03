@@ -39,6 +39,8 @@ public class SasuWebService {
     private ResultsViolationsDAOService resultsViolationsDAOService;
     @Autowired
     private ResultsSourcesDAOService resultsSourcesDAOService;
+    @Autowired
+    private ProcessDurationDAOService processDurationDAOService;
 
     public MappingResponse getMappings() {
         MappingDAOResponse daoresponse = mappingDAOService.getResponse();
@@ -145,4 +147,9 @@ public class SasuWebService {
         return mapper.map(daoResponse);
     }
 
+    public ProcessDurationResponse getProcessDuration(ProcessDurationRequest request) {
+        ProcessDurationDAORequest daoRequest = mapper.map(request);
+        ProcessDurationDAOResponse daoResponse = processDurationDAOService.getResponse(daoRequest);
+        return mapper.map(daoResponse);
+    }
 }

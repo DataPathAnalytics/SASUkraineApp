@@ -30,6 +30,7 @@ public class Tender {
     private Double value;
 
     private LocalDate startDate;
+    private boolean competitive;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "procurement_category_id")

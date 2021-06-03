@@ -38,7 +38,7 @@ public class MonitoringLoader {
     public void load(LocalDateTime offset) {
         restTemplate = new RestTemplate();
 
-        String url = new DefaultUriBuilderFactory(baseUrl).builder()
+        var url = new DefaultUriBuilderFactory(baseUrl).builder()
                 .queryParam(OFFSET, offset)
                 .build().toString();
 
@@ -51,7 +51,7 @@ public class MonitoringLoader {
             if (response == null || isEmpty(response.getData())) break;
 
             monitorings = response.getData();
-            monitorings.forEach(tender -> load(tender.getId()));
+            monitorings.forEach(monitoring -> load(monitoring.getId()));
 
             url = response.getNextPage().getUri();
         }

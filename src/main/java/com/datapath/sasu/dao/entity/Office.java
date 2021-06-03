@@ -16,6 +16,7 @@ public class Office {
     private Integer id;
 
     private String name;
+    private String outerName;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "region_id")

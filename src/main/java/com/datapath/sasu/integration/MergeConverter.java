@@ -2,6 +2,7 @@ package com.datapath.sasu.integration;
 
 import com.datapath.sasu.dao.DAO;
 import com.datapath.sasu.dao.entity.*;
+import com.datapath.sasu.integration.prozorro.calendar.CalendarHandler;
 import com.datapath.sasu.integration.prozorro.monitoring.containers.ConclusionAPI;
 import com.datapath.sasu.integration.prozorro.monitoring.containers.MonitoringAPI;
 import com.datapath.sasu.integration.prozorro.monitoring.containers.Party;
@@ -29,11 +30,16 @@ public class MergeConverter implements Converter {
 
     public static final String YEAR_MONTH_FORMAT = "yyyy-MM";
     public static final String SAS_ROLE = "sas";
+    public static final String CANCELLED = "cancelled";
+    public static final String STOPPED = "stopped";
+    public static final String OFFICE_NAME_PREFIX = "Територіальний підрозділ у ";
 
     @Autowired
     private DAO dao;
     @Autowired
     private VariableProcessor variableProcessor;
+    @Autowired
+    private CalendarHandler calendarHandler;
 
     @Override
     public Tender convert(TenderAPI tenderAPI) {
@@ -46,6 +52,7 @@ public class MergeConverter implements Converter {
         daoTender.setStatus(tenderAPI.getStatus());
         daoTender.setLocalMethod(tenderAPI.getProcurementMethodType());
         daoTender.setStartDate(LocalDate.parse(tenderAPI.getTenderID().substring(3, 13)));
+        daoTender.setCompetitive(OPEN_METHOD_TYPES.contains(tenderAPI.getProcurementMethodType()));
 
         Double tenderExpectedValue = variableProcessor.getTenderExpectedValue(tenderAPI);
         daoTender.setExpectedValue(tenderExpectedValue);
@@ -128,6 +135,10 @@ public class MergeConverter implements Converter {
         return value != null ? value.withZoneSameInstant(UA_ZONE).toLocalDateTime() : null;
     }
 
+    private LocalDate toLocalDate(ZonedDateTime value) {
+        return value != null ? value.withZoneSameInstant(UA_ZONE).toLocalDate() : null;
+    }
+
     @Override
     public Monitoring convert(MonitoringAPI monitoringAPI) {
 
@@ -137,6 +148,7 @@ public class MergeConverter implements Converter {
         monitoringEntity.setResult(monitoringAPI.getStatus());
         monitoringEntity.setStartDate(toLocalDateTime(monitoringAPI.getMonitoringPeriod().getStartDate()));
         monitoringEntity.setStartMonth(monitoringAPI.getMonitoringPeriod().getStartDate().format(ofPattern(YEAR_MONTH_FORMAT)));
+
 
         monitoringEntity.setTender(dao.getTender(monitoringAPI.getTenderId()).orElseThrow(() -> new EntityNotFoundException("Monitoring tender not found")));
 
@@ -150,6 +162,32 @@ public class MergeConverter implements Converter {
 
             monitoringEntity.getViolations().clear();
             monitoringEntity.getViolations().addAll(violations);
+        }
+
+        if (conclusion != null && conclusion.getDatePublished() != null) {
+            monitoringEntity.setConcluded(true);
+        }
+
+        //fixme review and refactor/simplify
+        if (monitoringEntity.isConcluded()) {
+            int workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    toLocalDate(monitoringAPI.getConclusion().getDatePublished())
+            );
+            monitoringEntity.setDuration(workDaysCount);
+        } else if (List.of(CANCELLED, STOPPED).contains(monitoringAPI.getStatus())) {
+
+            int workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    monitoringEntity.getDateModified().toLocalDate()
+            );
+            monitoringEntity.setDuration(workDaysCount);
+        } else {
+            int workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    LocalDate.now()
+            );
+            monitoringEntity.setDuration(workDaysCount);
         }
 
         if (!isEmpty(monitoringAPI.getReasons())) {
@@ -173,12 +211,16 @@ public class MergeConverter implements Converter {
 
                 monitoringEntity.setAuditor(auditorEntity);
 
-                var office = dao.getOffice(auditorAPI.getName()).orElse(new Office());
-                office.setName(auditorAPI.getName());
-
                 String regionAPI = auditorAPI.getAddress().getRegion();
+                if(auditorAPI.getName().equals("ПІВНІЧНИЙ ОФІС ДЕРЖАУДИТСЛУЖБИ ( обл.)")) {
+                    regionAPI = "Київська область";
+                }
 
-                office.setRegion(dao.getRegion(regionAPI));
+                Region region = dao.getRegion(regionAPI);
+
+                var office = dao.getOffice(region.getId()).orElse(new Office());
+                office.setName(OFFICE_NAME_PREFIX + region.getCaseName());
+                office.setRegion(region);
                 monitoringEntity.setOffice(office);
             }
         }

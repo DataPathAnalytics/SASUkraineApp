@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class ResultsSourcesRequest {
+public class ProcessDurationRequest {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -17,8 +17,6 @@ public class ResultsSourcesRequest {
     @NotNull
     private LocalDate endDate;
 
-    private List<Integer> offices;
-    private List<Integer> procuringEntityRegions;
-    private List<Integer> reasons;
+    private List<Integer> regions;
 
 }

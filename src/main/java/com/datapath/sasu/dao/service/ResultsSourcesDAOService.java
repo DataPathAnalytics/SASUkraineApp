@@ -24,25 +24,26 @@ public class ResultsSourcesDAOService {
     @Transactional
     public ResultsSourcesDAOResponse getResponse(ResultsSourcesDAORequest request) {
         var response = new ResultsSourcesDAOResponse();
-        response.setTendersAmount(getTendersAmount());
-        response.setTendersCount(getTendersCount(request));
+        response.setTotalTendersAmount(getTotalTendersAmount());
+        response.setTendersAmount(getTendersAmount(request));
         response.setReasonTenders(getReasonTenders(request));
         response.setViolations(getViolations(request));
         return response;
     }
 
-    private Long getTendersAmount() {
+    private Long getTotalTendersAmount() {
         String query = "SELECT SUM(tender_expected_value) FROM (" +
                 "SELECT DISTINCT ON(tender_id) tender_expected_value FROM results_sources" +
                 ") rs";
         return jdbcTemplate.queryForObject(query, Long.class);
     }
 
-    private Integer getTendersCount(ResultsSourcesDAORequest request) {
-        var query = "SELECT COUNT(DISTINCT tender_id) " +
-                "FROM results_sources " +
-                "WHERE TRUE " + getFilter(request);
-        return jdbcTemplate.queryForObject(query, Integer.class);
+    private Long getTendersAmount(ResultsSourcesDAORequest request) {
+        String query = "SELECT SUM(tender_expected_value) FROM (" +
+                "SELECT DISTINCT ON(tender_id) tender_expected_value FROM results_sources WHERE TRUE "
+                + getFilter(request) +
+                ") rs";
+        return jdbcTemplate.queryForObject(query, Long.class);
     }
 
     private List<ReasonTender> getReasonTenders(ResultsSourcesDAORequest request) {
@@ -60,7 +61,7 @@ public class ResultsSourcesDAOService {
                 "       SUM(tender_expected_value)           AS tenders_amount,\n" +
                 "       COUNT(DISTINCT procuring_entity_id) AS procuring_entities_count\n" +
                 "FROM results_sources\n" +
-                "WHERE violation_id IS NOT NULL " + getFilter(request) +
+                "WHERE violation_id IS NOT NULL " + getFilter(request) + getReasonFilter(request) +
                 "GROUP BY violation_id;";
         return jdbcTemplate.query(query, newInstance(Violation.class));
     }
@@ -78,6 +79,12 @@ public class ResultsSourcesDAOService {
         List<Integer> offices = request.getOffices();
         return isEmpty(offices) ? ""
                 : String.format(" AND office_id IN (%s) ", collectionToCommaDelimitedString(offices));
+    }
+
+    private String getReasonFilter(ResultsSourcesDAORequest request) {
+        List<Integer> reasons = request.getReasons();
+        return isEmpty(reasons) ? ""
+                : String.format(" AND reason_id IN (%s) ", collectionToCommaDelimitedString(reasons));
     }
 
     private String getRegionFilter(ResultsSourcesDAORequest request) {

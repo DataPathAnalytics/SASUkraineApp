@@ -41,29 +41,19 @@ public class HomeDAOService {
     }
 
     private List<ProcuringEntity> getTop20ProcuringEntities() {
-        String sql = "SELECT SUBSTR(procuring_entity_outer_id,7) AS outer_id, procuring_entity_name AS name, SUM(tender_expected_value) AS amount\n" +
-                "FROM home\n" +
-                "WHERE monitoring_result IN ('addressed', 'completed')\n" +
-                "GROUP BY procuring_entity_outer_id,procuring_entity_name\n" +
-                "ORDER BY amount DESC\n" +
+        String sql = "SELECT *\n" +
+                "FROM (\n" +
+                "         SELECT SUBSTR(procuring_entity_outer_id, 7) AS outer_id,\n" +
+                "                procuring_entity_name                AS name,\n" +
+                "                SUM(tender_expected_value)           AS amount\n" +
+                "         FROM home\n" +
+                "         WHERE monitoring_result IN ('addressed', 'completed')\n" +
+                "         GROUP BY procuring_entity_outer_id, procuring_entity_name\n" +
+                "     ) pr\n" +
+                "WHERE amount > 10000000\n" +
+                "ORDER BY RANDOM()\n" +
                 "LIMIT 20";
         return jdbcTemplate.query(sql, newInstance(ProcuringEntity.class));
-    }
-
-    private List<DateInteger> getTendersDynamic() {
-        String sql = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
-                "FROM home\n" +
-                "GROUP BY monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month";
-        return jdbcTemplate.query(sql, newInstance(DateInteger.class));
-    }
-
-    private List<DateInteger> getViolationsDynamic() {
-        String sql = "SELECT monitoring_start_month AS date, SUM(violations_count) AS value \n" +
-                "FROM home\n" +
-                "GROUP BY monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month";
-        return jdbcTemplate.query(sql, newInstance(DateInteger.class));
     }
 
     private Long getTendersAmount() {
@@ -87,7 +77,33 @@ public class HomeDAOService {
     }
 
     private Integer getViolationsCount() {
-        String sql = "SELECT SUM(violations_count) FROM home WHERE monitoring_result IN ('addressed', 'completed')";
+        String sql = "SELECT COUNT(DISTINCT tender_id) FROM home " +
+                "WHERE monitoring_result IN ('addressed','completed')";
         return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
+    private List<DateInteger> getTendersDynamic() {
+        LocalDate endMonitoringDate = LocalDate.now().withDayOfMonth(1);
+        LocalDate startMonitoringDate = endMonitoringDate.minusYears(2);
+
+        String sql = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
+                "FROM home\n" +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?)\n" +
+                "GROUP BY monitoring_start_month\n" +
+                "ORDER BY monitoring_start_month";
+        return jdbcTemplate.query(sql, newInstance(DateInteger.class), startMonitoringDate, endMonitoringDate);
+    }
+
+    private List<DateInteger> getViolationsDynamic() {
+        LocalDate endMonitoringDate = LocalDate.now().withDayOfMonth(1);
+        LocalDate startMonitoringDate = endMonitoringDate.minusYears(2);
+
+        String sql = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
+                "FROM home\n" +
+                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " +
+                "AND monitoring_result IN ('addressed','completed')\n" +
+                "GROUP BY monitoring_start_month\n" +
+                "ORDER BY monitoring_start_month";
+        return jdbcTemplate.query(sql, newInstance(DateInteger.class), startMonitoringDate, endMonitoringDate);
     }
 }

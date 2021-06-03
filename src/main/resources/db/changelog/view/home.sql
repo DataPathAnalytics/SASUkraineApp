@@ -12,6 +12,7 @@ SELECT t.id                            AS tender_id,
        p.id                            AS procuring_entity_id,
        p.outer_id                      AS procuring_entity_outer_id,
        m.result                        AS monitoring_result,
+       m.start_date                    AS monitoring_start_date,
        m.start_month                   AS monitoring_start_month,
        (SELECT COUNT(mv.violation_id)
         FROM monitoring_violation mv

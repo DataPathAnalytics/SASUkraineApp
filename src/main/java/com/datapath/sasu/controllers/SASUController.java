@@ -61,6 +61,11 @@ public class SASUController {
         return service.getProcessCoverage(request);
     }
 
+    @GetMapping("/process-duration")
+    public ProcessDurationResponse processDuration(@Validated ProcessDurationRequest request) {
+        return service.getProcessDuration(request);
+    }
+
     @GetMapping("/results-results")
     public ResultsResponse results(@Validated ResultsRequest request) {
         return service.getResults(request);

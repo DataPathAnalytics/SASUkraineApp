@@ -17,5 +17,4 @@ public interface VariableProcessor {
 
     CpvCatalogue getCpv(String code);
 
-
 }

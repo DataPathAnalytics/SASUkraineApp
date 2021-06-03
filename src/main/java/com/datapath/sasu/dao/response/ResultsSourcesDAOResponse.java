@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class ResultsSourcesDAOResponse {
 
+    private Long totalTendersAmount;
     private Long tendersAmount;
-    private Integer tendersCount;
     private List<ReasonTender> reasonTenders;
     private List<Violation> violations;
 

@@ -7,7 +7,8 @@ VALUES (1, 'Автономна республіка Крим')
 ON CONFLICT DO NOTHING;
 
 UPDATE region
-SET aliases = '{АР Крим}'
+SET aliases   = '{АР Крим}',
+    case_name = 'АР Крим'
 WHERE id = 1;
 
 INSERT INTO region(id, name)
@@ -15,7 +16,8 @@ VALUES (2, 'Вінницька область')
 ON CONFLICT DO NOTHING;
 
 UPDATE region
-SET aliases = '{Вiнницька область,Вінницька область,Вінницька обл.,Винницкая область,ВІННИЦЬКА ОБЛ,ВИННИЦКАЯ ОБЛ.,Вінницька}'
+SET aliases   = '{Вiнницька область,Вінницька область,Вінницька обл.,Винницкая область,ВІННИЦЬКА ОБЛ,ВИННИЦКАЯ ОБЛ.,Вінницька}',
+    case_name = 'Вiнницькій області'
 WHERE id = 2;
 
 INSERT INTO region(id, name)
@@ -23,7 +25,8 @@ VALUES (3, 'Волинська область')
 ON CONFLICT DO NOTHING;
 
 UPDATE region
-SET aliases = '{Волинська обл.,Волинська область,Волынская область,ВОЛЫНСКАЯ ОБЛ.,Волинська}'
+SET aliases   = '{Волинська обл.,Волинська область,Волынская область,ВОЛЫНСКАЯ ОБЛ.,Волинська}',
+    case_name = 'Волинській області'
 WHERE id = 3;
 
 INSERT INTO region(id, name)
@@ -54,7 +57,8 @@ SET aliases = ARRAY [
     'Дніпро',
     'ДНЕПРОПЕТРОВСКАЯ ОБЛ.',
     'Дніпропетровська'
-    ]::TEXT[]
+    ]::TEXT[],
+case_name = 'Дніпропетровській області'
 WHERE id = 4;
 
 INSERT INTO region(id, name)
@@ -71,7 +75,8 @@ SET aliases = ARRAY [
     'Донецька',
     'ДОНЕЦКАЯ ОБЛ.',
     'Донецька'
-    ]
+    ],
+    case_name = 'Донецькій області'
 WHERE id = 5;
 
 INSERT INTO region(id, name)
@@ -87,7 +92,8 @@ SET aliases = ARRAY [
     'Коростишівський',
     'ЖИТОМИРСЬКА ОБЛ',
     'Житомирська'
-    ]
+    ],
+    case_name = 'Житомирській області'
 WHERE id = 6;
 
 INSERT INTO region(id, name)
@@ -102,7 +108,8 @@ SET aliases = ARRAY [
     'Закарпатська',
     'ЗАКАРПАТСКАЯ ОБЛ.',
     'Закарпатська'
-    ]
+    ],
+    case_name = 'Закарпатській області'
 WHERE id = 7;
 
 INSERT INTO region(id, name)
@@ -126,7 +133,8 @@ SET aliases = ARRAY [
     'Запорізька область  Токмацький район',
     'Великобілозерський район',
     'Запорізька'
-    ]
+    ],
+    case_name = 'Запорізькій області'
 WHERE id = 8;
 
 INSERT INTO region(id, name)
@@ -141,7 +149,8 @@ SET aliases = ARRAY [
     'Галицький район Івано-Франківська обл',
     'Iвано-Франкiвська область',
     'Івано-Франківська'
-    ]
+    ],
+    case_name = 'Івано-Франківській області'
 WHERE id = 9;
 
 INSERT INTO region(id, name)
@@ -158,7 +167,8 @@ SET aliases = ARRAY [
     'київська',
     'Київська обл',
     'Киевская'
-    ]
+    ],
+    case_name = 'Київській області'
 WHERE id = 10;
 
 INSERT INTO region(id, name)
@@ -175,7 +185,8 @@ SET aliases = ARRAY [
     'Кропивницька',
     'Кировоградская область',
     'Кіровоградська'
-    ]
+    ],
+    case_name = 'Кіровоградській області'
 WHERE id = 11;
 
 
@@ -191,7 +202,8 @@ SET aliases = ARRAY [
     'Луганская область',
     'ЛУГАНСЬКА ОБЛ',
     'Луганська'
-    ]
+    ],
+    case_name = 'Луганській області'
 WHERE id = 12;
 
 INSERT INTO region(id, name)
@@ -206,7 +218,8 @@ SET aliases = ARRAY [
     'Львiвська область',
     'ЛЬВОВСКАЯ ОБЛ.',
     'Львівська'
-    ]
+    ],
+    case_name = 'Львівській області'
 WHERE id = 13;
 
 INSERT INTO region(id, name)
@@ -221,7 +234,8 @@ SET aliases = ARRAY [
     'смт.Воскресенське',
     'Врадіїївський район Миколаївська область',
     'Миколаївська'
-    ]
+    ],
+    case_name = 'Миколаївській області'
 WHERE id = 14;
 
 INSERT INTO region(id, name)
@@ -237,7 +251,8 @@ SET aliases = ARRAY [
     'Одеська',
     'ОДЕССКАЯ ОБЛ.',
     'Одесская'
-    ]
+    ],
+    case_name = 'Одеській області'
 WHERE id = 15;
 
 INSERT INTO region(id, name)
@@ -252,7 +267,8 @@ SET aliases = ARRAY [
     'Полтавская',
     'Полтавская область',
     'ПОЛТАВСЬКА'
-    ]
+    ],
+    case_name = 'Полтавській області'
 WHERE id = 16;
 
 INSERT INTO region(id, name)
@@ -267,7 +283,8 @@ SET aliases = ARRAY [
     'Ровенская область',
     'Рiвненська область',
     'Рівненська'
-    ]
+    ],
+    case_name = 'Рівненській області'
 WHERE id = 17;
 
 INSERT INTO region(id, name)
@@ -281,7 +298,8 @@ SET aliases = ARRAY [
     'Сумська обл., Великописарівський р-н',
     'Сумская область',
     'Сумська'
-    ]
+    ],
+    case_name = 'Сумській області'
 WHERE id = 18;
 
 INSERT INTO region(id, name)
@@ -295,7 +313,8 @@ SET aliases = ARRAY [
     'Тернопольская область',
     'Тернопільська',
     'Тернопiльська область'
-    ]
+    ],
+    case_name = 'Тернопільській області'
 WHERE id = 19;
 
 
@@ -313,7 +332,8 @@ SET aliases = ARRAY [
     'Харьковская область',
     'Харьківська обл.',
     'Харківська'
-    ]
+    ],
+    case_name = 'Харківській області'
 WHERE id = 20;
 
 INSERT INTO region(id, name)
@@ -328,7 +348,8 @@ SET aliases = ARRAY [
     'Нижньосірогозький р-н Херсонської області',
     'Херсонская',
     'Херсонська'
-    ]
+    ],
+    case_name = 'Херсонській області'
 WHERE id = 21;
 
 
@@ -344,7 +365,8 @@ SET aliases = ARRAY [
     'Хмельницька обл.',
     'Хмельницкая область',
     'Хмельницька'
-    ]
+    ],
+    case_name = 'Хмельницькій області'
 WHERE id = 22;
 
 INSERT INTO region(id, name)
@@ -358,7 +380,8 @@ SET aliases = ARRAY [
     'Черкасская область',
     'Черкаська',
     'ЧЕРКАССКАЯ ОБЛ.'
-    ]
+    ],
+    case_name = 'Черкаській області'
 WHERE id = 23;
 
 
@@ -374,7 +397,8 @@ SET aliases = ARRAY [
     'Чернiвецька область',
     'Боянчук',
     'Чернівецька'
-    ]
+    ],
+    case_name = 'Чернівецькій області'
 WHERE id = 24;
 
 INSERT INTO region(id, name)
@@ -390,7 +414,8 @@ SET aliases = ARRAY [
     'Черниговская область',
     'ЧЕРНИГОВСКАЯ ОБЛ.',
     'Чернігівська'
-    ]
+    ],
+    case_name = 'Чернігівській області'
 WHERE id = 25;
 
 INSERT INTO region(id, name)
@@ -412,5 +437,6 @@ SET aliases = ARRAY [
     'закупке',
     'Відповідно до документації',
     'Голосіївський район'
-    ]
+    ],
+    case_name = 'м.Київ'
 WHERE id = 26;

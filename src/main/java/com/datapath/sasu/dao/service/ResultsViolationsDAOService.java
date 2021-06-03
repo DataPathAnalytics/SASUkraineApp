@@ -64,15 +64,15 @@ public class ResultsViolationsDAOService {
 
     private List<Region> getRegions(ResultsViolationsDAORequest request) {
 
-        String filter = getFilter(request);
+        String filter = getFilter(request) + getActiveMonitoringFilter();
 
         String query = "WITH entity_regions AS (\n" +
                 "    SELECT procuring_entity_region_id          AS region_id,\n" +
                 "           SUM(tender_expected_value)          AS amount,\n" +
                 "           COUNT(DISTINCT tender_id)           AS tenders_count,\n" +
                 "           COUNT(DISTINCT procuring_entity_id) AS procuring_entities_count\n" +
-                "    FROM results_violations rv\n" +
-                "    WHERE procuring_entity_region_id IS NOT NULL " + filter +
+                "    FROM  (SELECT DISTINCT ON(tender_id) * FROM results_violations\n" +
+                "          WHERE procuring_entity_region_id IS NOT NULL " + filter + ") rv " +
                 "    GROUP BY procuring_entity_region_id\n" +
                 ")\n" +
                 "SELECT r.id AS region_id, er.amount, er.tenders_count, er.procuring_entities_count\n" +
@@ -101,6 +101,10 @@ public class ResultsViolationsDAOService {
     private String getViolationFilter(ResultsViolationsDAORequest request) {
         Integer violationId = request.getViolationId();
         return violationId == null ? "" : "AND violation_id = " + violationId;
+    }
+
+    private String getActiveMonitoringFilter() {
+        return "AND monitoring_result IN ('addressed','completed') ";
     }
 
 }

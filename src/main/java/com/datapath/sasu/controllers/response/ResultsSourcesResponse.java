@@ -9,7 +9,7 @@ import java.util.List;
 public class ResultsSourcesResponse {
 
     private Long tendersAmount;
-    private Integer tendersCount;
+    private Long totalTendersAmount;
     private List<ReasonTender> reasonTenders;
     private List<Violation> violations;
 

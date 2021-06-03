@@ -4,6 +4,7 @@ import com.datapath.sasu.dao.entity.*;
 import com.datapath.sasu.dao.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ public class DAOImpl implements DAO {
 
     private static final String KYIV_REGION = "м. Київ";
 
+    private final JdbcTemplate jdbcTemplate;
     private final ProcuringCategoryRepository procuringCategoryRepository;
     private final ExchangeRateRepository exchangeRateRepository;
     private final CpvCatalogueRepository cpvCatalogueRepository;
@@ -99,8 +101,24 @@ public class DAOImpl implements DAO {
     }
 
     @Override
-    public Optional<Office> getOffice(String name) {
-        return officeRepository.findByName(name);
+    public Optional<Office> getOffice(Integer regionId) {
+        return officeRepository.findByRegionId(regionId);
+    }
+
+    @Override
+    public List<Integer> getTendersWithDuplicatedMonitoring() {
+        String query = "SELECT tender_id FROM monitoring GROUP BY tender_id HAVING COUNT(*) > 1";
+        return jdbcTemplate.queryForList(query, Integer.class);
+    }
+
+    @Override
+    public List<Monitoring> getTenderMonitoring(Integer tenderId) {
+        return monitoringRepository.findByTenderId(tenderId);
+    }
+
+    @Override
+    public void delete(Monitoring monitoring) {
+        monitoringRepository.delete(monitoring);
     }
 
 }

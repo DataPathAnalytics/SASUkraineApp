@@ -68,10 +68,10 @@ public class ResultsDAOService {
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
 
         String query = "SELECT monitoring_result,\n" +
-                "       COUNT(DISTINCT tender_id)               AS tenders_count,\n" +
+                "       COUNT(DISTINCT monitoring_id)               AS tenders_count,\n" +
                 "       COALESCE(SUM(tender_expected_value), 0) AS amount\n" +
                 "FROM results_results " +
-                "WHERE monitoring_result IN ('active','addressed', 'complete', 'declined', 'closed') " +
+                "WHERE TRUE " +
                 "AND (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
                 "GROUP BY monitoring_result";
 
@@ -93,7 +93,6 @@ public class ResultsDAOService {
 
         return jdbcTemplate.query(query, newInstance(Dynamic.class), request.getStartDate(), request.getEndDate());
     }
-
 
 
 }

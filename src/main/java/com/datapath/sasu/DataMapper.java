@@ -46,5 +46,9 @@ public interface DataMapper {
 
     ResultsSourcesResponse map(ResultsSourcesDAOResponse daoResponse);
 
-    MappingResponse map(MappingDAOResponse daoresponse);
+    MappingResponse map(MappingDAOResponse daoResponse);
+
+    ProcessDurationDAORequest map(ProcessDurationRequest request);
+
+    ProcessDurationResponse map(ProcessDurationDAOResponse daoResponse);
 }
