@@ -33,14 +33,14 @@ public class ResultsSourcesDAOService {
 
     private Long getTotalTendersAmount() {
         String query = "SELECT SUM(tender_expected_value) FROM (" +
-                "SELECT DISTINCT ON(tender_id) tender_expected_value FROM results_sources" +
+                "SELECT DISTINCT ON(tender_id,monitoring_id) tender_expected_value FROM results_sources WHERE has_monitoring IS TRUE" +
                 ") rs";
         return jdbcTemplate.queryForObject(query, Long.class);
     }
 
     private Long getTendersAmount(ResultsSourcesDAORequest request) {
-        String query = "SELECT SUM(tender_expected_value) FROM (" +
-                "SELECT DISTINCT ON(tender_id) tender_expected_value FROM results_sources WHERE TRUE "
+        String query = "SELECT SUM(awards_value) FROM (" +
+                "SELECT DISTINCT ON(tender_id) awards_value FROM results_sources WHERE TRUE "
                 + getFilter(request) +
                 ") rs";
         return jdbcTemplate.queryForObject(query, Long.class);
@@ -48,7 +48,7 @@ public class ResultsSourcesDAOService {
 
     private List<ReasonTender> getReasonTenders(ResultsSourcesDAORequest request) {
         String query = "SELECT reason_id,\n" +
-                "       COUNT(DISTINCT tender_id) FILTER ( WHERE monitoring_result IN ('addressed', 'complete') ) violation_tenders_count,\n" +
+                "       COUNT(DISTINCT tender_id) FILTER ( WHERE monitoring_result IN ('addressed', 'completed') ) violation_tenders_count,\n" +
                 "       COUNT(DISTINCT tender_id) FILTER ( WHERE monitoring_result  IN ('declined', 'closed') ) non_violation_tenders_count\n" +
                 "FROM results_sources WHERE reason_id IS NOT NULL " + getFilter(request) +
                 "GROUP BY reason_id";
@@ -71,7 +71,7 @@ public class ResultsSourcesDAOService {
     }
 
     private String getMonitoringDateFilter(ResultsSourcesDAORequest request) {
-        return String.format(" AND (monitoring_start_date >= '%s' AND monitoring_start_date < '%s')",
+        return String.format(" AND (monitoring_end_date >= '%s' AND monitoring_end_date < '%s')",
                 request.getStartDate(), request.getEndDate());
     }
 

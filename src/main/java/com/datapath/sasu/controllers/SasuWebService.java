@@ -7,12 +7,17 @@ import com.datapath.sasu.dao.request.*;
 import com.datapath.sasu.dao.response.*;
 import com.datapath.sasu.dao.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class SasuWebService {
 
+    @Value("${dasu.support.email}")
+    private String supportEmail;
     @Autowired
     private DataMapper mapper;
     @Autowired
@@ -41,6 +46,8 @@ public class SasuWebService {
     private ResultsSourcesDAOService resultsSourcesDAOService;
     @Autowired
     private ProcessDurationDAOService processDurationDAOService;
+    @Autowired
+    private JavaMailSender mailSender;
 
     public MappingResponse getMappings() {
         MappingDAOResponse daoresponse = mappingDAOService.getResponse();
@@ -151,5 +158,14 @@ public class SasuWebService {
         ProcessDurationDAORequest daoRequest = mapper.map(request);
         ProcessDurationDAOResponse daoResponse = processDurationDAOService.getResponse(daoRequest);
         return mapper.map(daoResponse);
+    }
+
+    public void sendSupportEmail(SupportEmailRequest request) {
+        var message = new SimpleMailMessage();
+        message.setFrom(request.getFrom());
+        message.setTo(supportEmail);
+        message.setSubject(request.getSubject());
+        message.setText(request.getText());
+        mailSender.send(message);
     }
 }

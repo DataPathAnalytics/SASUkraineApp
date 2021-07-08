@@ -18,8 +18,8 @@ public class TenderDAOServiceImpl implements TenderDAOService {
     }
 
     @Override
-    public void save(Tender tender) {
-        repository.save(tender);
+    public Integer save(Tender tender) {
+        return repository.save(tender).getId();
     }
 
 }

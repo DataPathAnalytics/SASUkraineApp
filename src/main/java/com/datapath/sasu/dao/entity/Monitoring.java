@@ -26,6 +26,9 @@ public class Monitoring {
     private LocalDateTime startDate;
     private String startMonth;
 
+    private LocalDateTime endDate;
+    private String endMonth;
+
     private Integer duration;
     private boolean concluded;
 

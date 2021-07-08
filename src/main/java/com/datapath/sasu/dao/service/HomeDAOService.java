@@ -86,11 +86,11 @@ public class HomeDAOService {
         LocalDate endMonitoringDate = LocalDate.now().withDayOfMonth(1);
         LocalDate startMonitoringDate = endMonitoringDate.minusYears(2);
 
-        String sql = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
+        String sql = "SELECT monitoring_end_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
                 "FROM home\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?)\n" +
-                "GROUP BY monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month";
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?)\n" +
+                "GROUP BY monitoring_end_month\n" +
+                "ORDER BY monitoring_end_month";
         return jdbcTemplate.query(sql, newInstance(DateInteger.class), startMonitoringDate, endMonitoringDate);
     }
 
@@ -98,12 +98,12 @@ public class HomeDAOService {
         LocalDate endMonitoringDate = LocalDate.now().withDayOfMonth(1);
         LocalDate startMonitoringDate = endMonitoringDate.minusYears(2);
 
-        String sql = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
+        String sql = "SELECT monitoring_end_month AS date, COUNT(DISTINCT tender_id) AS value \n" +
                 "FROM home\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " +
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " +
                 "AND monitoring_result IN ('addressed','completed')\n" +
-                "GROUP BY monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month";
+                "GROUP BY monitoring_end_month\n" +
+                "ORDER BY monitoring_end_month";
         return jdbcTemplate.query(sql, newInstance(DateInteger.class), startMonitoringDate, endMonitoringDate);
     }
 }

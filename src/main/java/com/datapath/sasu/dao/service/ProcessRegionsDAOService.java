@@ -21,7 +21,7 @@ public class ProcessRegionsDAOService {
     private final JdbcTemplate jdbcTemplate;
 
     public ProcessRegionsDAOResponse getResponse(ProcessRegionsDAORequest request) {
-        ProcessRegionsDAOResponse response = new ProcessRegionsDAOResponse();
+        var response = new ProcessRegionsDAOResponse();
         response.setTotalProcuringEntitiesCount(getTotalProcuringEntitiesCount());
         response.setProcuringEntitiesCount(getProcuringEntitiesCount(request));
 
@@ -46,7 +46,7 @@ public class ProcessRegionsDAOService {
     private Integer getProcuringEntitiesCount(ProcessRegionsDAORequest request) {
         String query = "SELECT COUNT(DISTINCT procuring_entity_id) " +
                 "FROM process_regions " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?)";
+                "WHERE has_monitoring IS TRUE AND (monitoring_end_date >= ? AND monitoring_end_date < ?)";
         return jdbcTemplate.queryForObject(query, Integer.class, request.getStartDate(), request.getEndDate());
     }
 
@@ -59,8 +59,9 @@ public class ProcessRegionsDAOService {
                 "       COUNT(DISTINCT procuring_entity_id) AS procuring_entities_count\n" +
                 "FROM region r\n" +
                 "         LEFT JOIN process_regions pr ON pr.procuring_entity_region_id = r.id AND\n" +
-                "                                         (monitoring_start_date >= ? AND\n" +
-                "                                          monitoring_start_date < ?)" + sasuRegionClause +
+                "                                         has_monitoring IS TRUE AND \n" +
+                "                                         (monitoring_end_date >= ? AND\n" +
+                "                                          monitoring_end_date < ?)" + sasuRegionClause +
                 "GROUP BY r.id";
         return jdbcTemplate.query(query, newInstance(RegionProcuringEntity.class),
                 request.getStartDate(), request.getEndDate());
@@ -79,13 +80,13 @@ public class ProcessRegionsDAOService {
                 "       (SELECT name FROM cpv_catalogue WHERE cpv = pr.cpv2) AS name,\n" +
                 "       COALESCE(COUNT(DISTINCT tender_id),0)                           AS tenders_count\n" +
                 "FROM process_regions pr\n" +
-                "WHERE TRUE " + sasuRegionClause + procuringEntityRegionClause +
+                "WHERE has_monitoring IS TRUE AND (monitoring_end_date >= ? AND monitoring_end_date < ?) " + sasuRegionClause + procuringEntityRegionClause +
                 "GROUP BY pr.cpv2\n" +
                 "ORDER BY tenders_count DESC\n" +
                 "LIMIT 5";
 
 
-        return jdbcTemplate.query(query, newInstance(Cpv.class));
+        return jdbcTemplate.query(query, newInstance(Cpv.class), request.getStartDate(), request.getEndDate());
     }
 
     private List<Cpv> getTopCpv2ByAmount(ProcessRegionsDAORequest request) {
@@ -100,11 +101,12 @@ public class ProcessRegionsDAOService {
                 "       (SELECT name FROM cpv_catalogue WHERE cpv = pr.cpv2)        AS name,\n" +
                 "       COALESCE(SUM(tender_expected_value), 0) AS amount\n" +
                 "FROM process_regions pr\n" +
-                "WHERE TRUE " + sasuRegionClause + procuringEntityRegionClause +
+                "WHERE has_monitoring IS TRUE AND (monitoring_end_date >= ? AND monitoring_end_date < ?)"
+                + sasuRegionClause + procuringEntityRegionClause +
                 "GROUP BY pr.cpv2\n" +
                 "ORDER BY amount DESC\n" +
                 "LIMIT 5";
-        return jdbcTemplate.query(query, newInstance(Cpv.class));
+        return jdbcTemplate.query(query, newInstance(Cpv.class), request.getStartDate(), request.getEndDate());
     }
 
     private Double getTendersAmount(ProcessRegionsDAORequest request) {
@@ -116,7 +118,7 @@ public class ProcessRegionsDAOService {
                 : String.format(" AND sasu_region_id IN (%s) ", collectionToCommaDelimitedString(request.getSasuRegions()));
 
 
-        String query = "SELECT COALESCE(SUM(tender_expected_value), 0) FROM process_regions WHERE TRUE " + sasuRegionClause + procuringEntityRegionClause;
+        String query = "SELECT COALESCE(SUM(tender_expected_value), 0) FROM process_regions WHERE has_monitoring IS TRUE " + sasuRegionClause + procuringEntityRegionClause;
         return jdbcTemplate.queryForObject(query, Double.class);
     }
 
@@ -129,7 +131,7 @@ public class ProcessRegionsDAOService {
         String sasuRegionClause = isEmpty(request.getSasuRegions()) ? ""
                 : String.format(" AND sasu_region_id IN (%s) ", collectionToCommaDelimitedString(request.getSasuRegions()));
 
-        String query = "SELECT COALESCE(COUNT(DISTINCT tender_id),0) FROM process_regions WHERE TRUE " + sasuRegionClause + procuringEntityRegionClause;
+        String query = "SELECT COALESCE(COUNT(DISTINCT tender_id),0) FROM process_regions WHERE has_monitoring IS TRUE " + sasuRegionClause + procuringEntityRegionClause;
         return jdbcTemplate.queryForObject(query, Integer.class);
     }
 

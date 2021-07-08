@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="end_date" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="end_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="end_month" tableName="monitoring"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="monitoring">
+            <column name="end_month" type="text"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="3" author="eddy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="has_monitoring" tableName="tender"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="tender">
+            <column name="has_monitoring" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="4" author="eddy">
+        <addNotNullConstraint tableName="procuring_entity" columnName="region_id"/>
+    </changeSet>
+
+</databaseChangeLog>

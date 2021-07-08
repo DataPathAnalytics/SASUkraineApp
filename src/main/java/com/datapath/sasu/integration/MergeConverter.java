@@ -21,6 +21,7 @@ import java.util.List;
 import static com.datapath.sasu.Constants.OPEN_METHOD_TYPES;
 import static com.datapath.sasu.Constants.UA_ZONE;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -33,6 +34,8 @@ public class MergeConverter implements Converter {
     public static final String CANCELLED = "cancelled";
     public static final String STOPPED = "stopped";
     public static final String OFFICE_NAME_PREFIX = "Територіальний підрозділ у ";
+    public static final int MAX_MONITORING_DURATION = 15;
+    public static final String COMPLETE = "complete";
 
     @Autowired
     private DAO dao;
@@ -86,6 +89,11 @@ public class MergeConverter implements Converter {
 
     private void mergeAwards(TenderAPI tenderAPI, Tender tenderEntity) {
         if (isEmpty(tenderAPI.getAwards())) return;
+
+        if (!tenderAPI.getStatus().equalsIgnoreCase(COMPLETE)) {
+            tenderEntity.clearAwards();
+            return;
+        }
 
         tenderAPI.getAwards().forEach(apiAward -> {
             var award = tenderEntity.getAwards().stream()
@@ -166,29 +174,16 @@ public class MergeConverter implements Converter {
 
         if (conclusion != null && conclusion.getDatePublished() != null) {
             monitoringEntity.setConcluded(true);
+
+            LocalDateTime endDate = toLocalDateTime(conclusion.getDatePublished());
+            monitoringEntity.setEndDate(endDate);
+            monitoringEntity.setEndMonth(endDate.format(ofPattern(YEAR_MONTH_FORMAT)));
         }
 
         //fixme review and refactor/simplify
-        if (monitoringEntity.isConcluded()) {
-            int workDaysCount = calendarHandler.getWorkDaysCount(
-                    monitoringEntity.getStartDate().toLocalDate(),
-                    toLocalDate(monitoringAPI.getConclusion().getDatePublished())
-            );
-            monitoringEntity.setDuration(workDaysCount);
-        } else if (List.of(CANCELLED, STOPPED).contains(monitoringAPI.getStatus())) {
 
-            int workDaysCount = calendarHandler.getWorkDaysCount(
-                    monitoringEntity.getStartDate().toLocalDate(),
-                    monitoringEntity.getDateModified().toLocalDate()
-            );
-            monitoringEntity.setDuration(workDaysCount);
-        } else {
-            int workDaysCount = calendarHandler.getWorkDaysCount(
-                    monitoringEntity.getStartDate().toLocalDate(),
-                    LocalDate.now()
-            );
-            monitoringEntity.setDuration(workDaysCount);
-        }
+        int workDaysCount = calcDuration(monitoringAPI, monitoringEntity);
+        monitoringEntity.setDuration(workDaysCount);
 
         if (!isEmpty(monitoringAPI.getReasons())) {
             List<Reason> reasons = monitoringAPI.getReasons().stream()
@@ -212,7 +207,7 @@ public class MergeConverter implements Converter {
                 monitoringEntity.setAuditor(auditorEntity);
 
                 String regionAPI = auditorAPI.getAddress().getRegion();
-                if(auditorAPI.getName().equals("ПІВНІЧНИЙ ОФІС ДЕРЖАУДИТСЛУЖБИ ( обл.)")) {
+                if (auditorAPI.getName().equals("ПІВНІЧНИЙ ОФІС ДЕРЖАУДИТСЛУЖБИ ( обл.)")) {
                     regionAPI = "Київська область";
                 }
 
@@ -226,6 +221,27 @@ public class MergeConverter implements Converter {
         }
 
         return monitoringEntity;
+    }
+
+    private int calcDuration(MonitoringAPI monitoringAPI, Monitoring monitoringEntity) {
+        int workDaysCount;
+        if (monitoringEntity.isConcluded()) {
+            workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    toLocalDate(monitoringAPI.getConclusion().getDatePublished())
+            );
+        } else if (List.of(CANCELLED, STOPPED).contains(monitoringAPI.getStatus())) {
+            workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    monitoringEntity.getDateModified().toLocalDate()
+            );
+        } else {
+            workDaysCount = calendarHandler.getWorkDaysCount(
+                    monitoringEntity.getStartDate().toLocalDate(),
+                    LocalDate.now()
+            );
+        }
+        return Math.min(workDaysCount, MAX_MONITORING_DURATION);
     }
 
 }

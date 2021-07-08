@@ -1,6 +1,6 @@
 package com.datapath.sasu;
 
-import com.datapath.sasu.integration.prozorro.monitoring.MonitoringCleaner;
+import com.datapath.sasu.integration.prozorro.monitoring.MonitoringDescendingLoader;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,7 +29,7 @@ import static com.datapath.sasu.Constants.UA_ZONE;
 public class SasuApplication {
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(SasuApplication.class);
+        var application = new SpringApplication(SasuApplication.class);
         application.addListeners(new ApplicationPidFileWriter());
         application.run(args);
     }
@@ -47,10 +47,5 @@ public class SasuApplication {
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone(UA_ZONE));
     }
-
-//    @Bean
-//    public CommandLineRunner startUp(MonitoringCleaner cleaner) {
-//        return (args) -> cleaner.clean();
-//    }
 
 }

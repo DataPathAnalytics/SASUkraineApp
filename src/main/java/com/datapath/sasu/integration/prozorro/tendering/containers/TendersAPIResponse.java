@@ -11,6 +11,6 @@ public class TendersAPIResponse {
     private List<TenderAPI> data;
     @JsonProperty("next_page")
     private Page nextPage;
-    @JsonProperty("prev_page")
-    private Page prevPage;
+//    @JsonProperty("prev_page")
+//    private Page prevPage;
 }

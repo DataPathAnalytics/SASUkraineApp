@@ -8,6 +8,6 @@ public interface TenderDAOService {
 
     Optional<Tender> getLastModifiedTender();
 
-    void save(Tender tender);
+    Integer save(Tender tender);
 
 }

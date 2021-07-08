@@ -56,7 +56,7 @@ public class ProcessMethodsDAOService {
 
         String query = "SELECT COUNT(DISTINCT tender_id) " +
                 "FROM process_methods " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause;
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + regionClause;
         return jdbcTemplate.queryForObject(query, Integer.class, request.getStartDate(), request.getEndDate());
     }
 
@@ -66,7 +66,7 @@ public class ProcessMethodsDAOService {
 
         String query = "SELECT SUM(tender_expected_value) " +
                 "FROM process_methods " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause;
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + regionClause;
         return jdbcTemplate.queryForObject(query, Double.class, request.getStartDate(), request.getEndDate());
     }
 
@@ -77,7 +77,7 @@ public class ProcessMethodsDAOService {
 
         String query = "SELECT COUNT(DISTINCT procuring_entity_id) " +
                 "FROM process_methods " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause;
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + regionClause;
         return jdbcTemplate.queryForObject(query, Integer.class, request.getStartDate(), request.getEndDate());
     }
 
@@ -89,7 +89,7 @@ public class ProcessMethodsDAOService {
         String query = "WITH methods AS (\n" +
                 "    SELECT tender_local_method AS name, COUNT(DISTINCT tender_id) AS tenders_count, SUM(tender_expected_value) AS amount\n" +
                 "    FROM process_methods\n" +
-                "    WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?)" + regionClause +
+                "    WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?)" + regionClause +
                 "    GROUP BY tender_local_method\n" +
                 ")\n" +
                 "SELECT *,\n" +
@@ -105,11 +105,11 @@ public class ProcessMethodsDAOService {
         String regionClause = CollectionUtils.isEmpty(request.getRegions()) ? ""
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(request.getRegions()));
 
-        String query = "SELECT monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS tenders_count, SUM(tender_expected_value) AS amount\n" +
+        String query = "SELECT monitoring_end_month AS date, COUNT(DISTINCT tender_id) AS tenders_count, SUM(tender_expected_value) AS amount\n" +
                 "FROM process_methods\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?)" + regionClause +
-                "GROUP BY monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month";
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?)" + regionClause +
+                "GROUP BY monitoring_end_month\n" +
+                "ORDER BY monitoring_end_month";
 
         return jdbcTemplate.query(query, BeanPropertyRowMapper.newInstance(MonitoringDynamic.class), request.getStartDate(), request.getEndDate());
     }

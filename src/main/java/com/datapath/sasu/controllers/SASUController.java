@@ -4,10 +4,7 @@ import com.datapath.sasu.controllers.request.*;
 import com.datapath.sasu.controllers.response.*;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -84,6 +81,11 @@ public class SASUController {
     @RequestMapping("/results-sources")
     public ResultsSourcesResponse resultsSources(@Validated ResultsSourcesRequest request) {
         return service.getResultsSources(request);
+    }
+
+    @PostMapping("support/email")
+    public void sendSupportEmail(@RequestBody @Validated SupportEmailRequest request) {
+        service.sendSupportEmail(request);
     }
 
 }

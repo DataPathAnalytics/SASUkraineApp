@@ -56,4 +56,8 @@ public class Tender {
         item.setTender(this);
     }
 
+    public void clearAwards() {
+        awards.clear();
+    }
+
 }

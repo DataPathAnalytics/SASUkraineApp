@@ -33,7 +33,7 @@ public class ResultsViolationsDAOService {
     }
 
     private Integer getTotalProcuringEntitiesCount() {
-        var query = "SELECT COUNT(DISTINCT procuring_entity_id) FROM results_violations";
+        var query = "SELECT COUNT(DISTINCT procuring_entity_id) FROM results_violations WHERE monitoring_result IN ('addressed', 'completed')";
         return jdbcTemplate.queryForObject(query, Integer.class);
     }
 
@@ -88,7 +88,7 @@ public class ResultsViolationsDAOService {
     }
 
     private String getMonitoringDateFilter(ResultsViolationsDAORequest request) {
-        return String.format(" AND (monitoring_start_date >= '%s' AND monitoring_start_date < '%s')",
+        return String.format(" AND (monitoring_end_date >= '%s' AND monitoring_end_date < '%s')",
                 request.getStartDate(), request.getEndDate());
     }
 

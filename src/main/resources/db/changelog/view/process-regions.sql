@@ -7,13 +7,14 @@ DROP MATERIALIZED VIEW IF EXISTS process_regions;
 CREATE MATERIALIZED VIEW process_regions AS
 SELECT t.id             AS tender_id,
        t.expected_value AS tender_expected_value,
+       t.has_monitoring AS has_monitoring,
        c.cpv2           AS cpv2,
        p.id             AS procuring_entity_id,
        r.id             AS procuring_entity_region_id,
        s.sasu_region_id AS sasu_region_id,
        m.id             AS monitoring_id,
-       m.start_date     AS monitoring_start_date,
-       m.start_month    AS monitoring_start_month
+       m.end_month      AS monitoring_end_month,
+       m.end_date       AS monitoring_end_date
 FROM tender AS t
          JOIN procuring_entity AS p ON t.procuring_entity_id = p.id
          JOIN region AS r ON p.region_id = r.id

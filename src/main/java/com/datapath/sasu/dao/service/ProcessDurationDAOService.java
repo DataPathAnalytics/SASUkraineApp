@@ -44,7 +44,7 @@ public class ProcessDurationDAOService {
     }
 
     private List<Region> getRegions(ProcessDurationDAORequest request) {
-        String query = "SELECT r.id AS region_id, COALESCE(AVG(monitoring_duration), 0) AS duration\n" +
+        String query = "SELECT r.id AS region_id, COALESCE(ROUND(AVG(monitoring_duration)), 0) AS duration\n" +
                 "FROM region r\n" +
                 "         LEFT JOIN\n" +
                 "     process_duration pd ON r.id = pd.region_id " + getMonitoringDateFilter(request) +
@@ -80,7 +80,7 @@ public class ProcessDurationDAOService {
     }
 
     private String getMonitoringDateFilter(ProcessDurationDAORequest request) {
-        return String.format(" AND (monitoring_start_date >= '%s' AND monitoring_start_date < '%s') ",
+        return String.format(" AND (monitoring_end_date >= '%s' AND monitoring_end_date < '%s') ",
                 request.getStartDate(), request.getEndDate());
     }
 

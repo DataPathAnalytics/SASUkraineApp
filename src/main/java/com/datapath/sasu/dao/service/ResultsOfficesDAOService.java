@@ -50,7 +50,7 @@ public class ResultsOfficesDAOService {
         String query = "SELECT SUM(tender_expected_value)\n" +
                 "FROM (\n" +
                 "         SELECT DISTINCT ON (tender_id) tender_expected_value\n" +
-                "         FROM results_offices WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter +
+                "         FROM results_offices WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + violationFilter +
                 "     ) rf";
 
         return jdbcTemplate.queryForObject(query, Double.class,request.getStartDate(),request.getEndDate());
@@ -60,10 +60,10 @@ public class ResultsOfficesDAOService {
         String violationFilter = request.getViolationId() == null ? "" : "AND violation_id = " + request.getViolationId();
 
         String query = "SELECT sasu_office_id AS id, sasu_office_name AS name, " +
-                "monitoring_start_month AS date, COUNT(DISTINCT tender_id) AS tenders_count\n" +
+                "monitoring_end_month AS date, COUNT(DISTINCT tender_id) AS tenders_count\n" +
                 "FROM results_offices " +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter +
-                "GROUP BY sasu_office_id, sasu_office_name, monitoring_start_month;";
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + violationFilter +
+                "GROUP BY sasu_office_id, sasu_office_name, monitoring_end_month;";
 
         return jdbcTemplate.query(query, newInstance(Office.class), request.getStartDate(), request.getEndDate());
     }
@@ -72,13 +72,13 @@ public class ResultsOfficesDAOService {
         String violationFilter = request.getViolationId() == null ? "" : "AND violation_id = " + request.getViolationId();
 
         String query = "SELECT sasu_office_id                      AS office_id,\n" +
-                "       monitoring_start_month              AS date,\n" +
+                "       monitoring_end_month              AS date,\n" +
                 "       COUNT(DISTINCT tender_id)           AS tenders_count,\n" +
                 "       COUNT(DISTINCT procuring_entity_id) AS procuring_entity_count,\n" +
                 "       SUM(tender_expected_value) AS amount\n" +
                 "FROM results_offices ro\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + violationFilter + getOfficeFilter(request) +
-                "GROUP BY sasu_office_id, monitoring_start_month";
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + violationFilter + getOfficeFilter(request) +
+                "GROUP BY sasu_office_id, monitoring_end_month";
 
         return jdbcTemplate.query(query, newInstance(TenderDynamic.class), request.getStartDate(), request.getEndDate());
     }

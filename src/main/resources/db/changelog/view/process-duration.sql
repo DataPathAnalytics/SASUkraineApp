@@ -8,7 +8,8 @@ CREATE MATERIALIZED VIEW process_duration AS
 SELECT t.local_method AS local_method,
        t.competitive  AS competitive,
        m.duration     AS monitoring_duration,
-       m.start_date   AS monitoring_start_date,
+       m.end_month      AS monitoring_end_month,
+       m.end_date       AS monitoring_end_date,
        m.concluded    AS monitoring_cocluded,
        o.region_id    AS region_id
 FROM tender AS t

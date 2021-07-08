@@ -4,7 +4,6 @@ import com.datapath.sasu.CookieInterceptor;
 import com.datapath.sasu.dao.entity.Tender;
 import com.datapath.sasu.dao.service.TenderDAOService;
 import com.datapath.sasu.integration.prozorro.tendering.containers.TenderAPI;
-import com.datapath.sasu.integration.prozorro.tendering.containers.TenderAPIResponse;
 import com.datapath.sasu.integration.prozorro.tendering.containers.TendersAPIResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +71,7 @@ public class TenderingLoader {
     }
 
     private void saveTender(String id) {
-        TenderAPIResponse response = restTemplate.getForObject(apiUrl + "/" + id, TenderAPIResponse.class);
-        TenderAPI tenderApi = response.getData();
-        tenderHandler.handle(tenderApi);
+        tenderHandler.handle(id);
     }
 
     private LocalDateTime getOffset() {

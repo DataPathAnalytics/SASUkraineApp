@@ -12,11 +12,12 @@ SELECT t.id                            AS tender_id,
        p.id                            AS procuring_entity_id,
        p.outer_id                      AS procuring_entity_outer_id,
        m.result                        AS monitoring_result,
-       m.start_date                    AS monitoring_start_date,
-       m.start_month                   AS monitoring_start_month,
+       m.end_month                     AS monitoring_end_month,
+       m.end_date                      AS monitoring_end_date,
        (SELECT COUNT(mv.violation_id)
         FROM monitoring_violation mv
         WHERE mv.monitoring_id = m.id) AS violations_count
 FROM tender AS t
          JOIN procuring_entity AS p ON p.id = t.procuring_entity_id
-         JOIN monitoring AS m ON t.id = m.tender_id;
+         JOIN monitoring AS m ON t.id = m.tender_id
+WHERE t.has_monitoring IS TRUE AND p.region_id IS NOT NULL

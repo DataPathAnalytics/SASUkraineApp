@@ -31,7 +31,7 @@ public class ResourcesDasuGeographyDAOService {
 
         return jdbcTemplate.queryForObject(
                 "SELECT COUNT(DISTINCT auditor_id) FROM resources_dasu_geography " +
-                        "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause,
+                        "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + regionClause,
                 Integer.class, startDate, endDate);
     }
 
@@ -40,7 +40,7 @@ public class ResourcesDasuGeographyDAOService {
         return jdbcTemplate.query("SELECT r.id AS region_id, COUNT(DISTINCT g.auditor_id) auditors_count\n" +
                 "FROM region r\n" +
                 "         LEFT JOIN resources_dasu_geography g ON r.id = g.region_id " +
-                "AND (monitoring_start_date >= ? AND monitoring_start_date < ?)\n" +
+                "AND (monitoring_end_date >= ? AND monitoring_end_date < ?)\n" +
                 "GROUP BY r.id", new BeanPropertyRowMapper<>(RegionAuditors.class), startDate, endDate);
     }
 
@@ -49,11 +49,11 @@ public class ResourcesDasuGeographyDAOService {
         String regionClause = CollectionUtils.isEmpty(regionIds) ? ""
                 : String.format("AND region_id IN (%s) ", collectionToCommaDelimitedString(regionIds));
 
-        return jdbcTemplate.query("SELECT region_id,monitoring_start_month AS date,COUNT(DISTINCT auditor_id) auditors_count\n" +
+        return jdbcTemplate.query("SELECT region_id,monitoring_end_month AS date,COUNT(DISTINCT auditor_id) auditors_count\n" +
                 "FROM resources_dasu_geography\n" +
-                "WHERE (monitoring_start_date >= ? AND monitoring_start_date < ?) " + regionClause +
-                "GROUP BY region_id,monitoring_start_month\n" +
-                "ORDER BY monitoring_start_month DESC", new BeanPropertyRowMapper<>(MonthAuditors.class), startDate, endDate);
+                "WHERE (monitoring_end_date >= ? AND monitoring_end_date < ?) " + regionClause +
+                "GROUP BY region_id,monitoring_end_month\n" +
+                "ORDER BY monitoring_end_month DESC", new BeanPropertyRowMapper<>(MonthAuditors.class), startDate, endDate);
     }
 
 }
